@@ -27,7 +27,7 @@ impl VAO {
     ) {
         unsafe {
             gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
-            gl::EnableVertexAttribArray(0);
+            gl::EnableVertexAttribArray(layout);
             gl::VertexAttribPointer(layout, num_components, data_type, gl::FALSE, stride, offset);
         }
     }

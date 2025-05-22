@@ -42,9 +42,9 @@ fn main() {
     shader_program.set_used();
 
     let vbo = VBO::from_verts(vec![
-        -0.5, -0.5, 0.0, //
-        0.5, -0.5, 0.0, //
-        0.0, 0.5, 0.0, //
+        0.5, -0.5, 0.0, /**/ 1.0, 0.0, 0.0, // bottom right
+        -0.5, -0.5, 0.0, /**/ 0.0, 1.0, 0.0, // top left
+        0.0, 0.5, 0.0, /**/ 0.0, 0.0, 1.0, // top right
     ]);
     vbo.bind();
 
@@ -56,8 +56,16 @@ fn main() {
         0,
         3,
         gl::FLOAT,
-        (3 * std::mem::size_of::<f32>()) as gl::types::GLint,
+        (6 * std::mem::size_of::<f32>()) as gl::types::GLint,
         std::ptr::null(),
+    );
+    vao.link_attribute(
+        vbo.id(),
+        1,
+        3,
+        gl::FLOAT,
+        (6 * std::mem::size_of::<f32>()) as gl::types::GLint,
+        (3 * std::mem::size_of::<f32>()) as *const gl::types::GLvoid,
     );
     vao.unbind();
     vbo.unbind();
