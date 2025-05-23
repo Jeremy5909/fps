@@ -1,3 +1,5 @@
+use std::mem;
+
 pub struct Vertex {
     pub pos: (f32, f32, f32),
     pub col: (f32, f32, f32),
@@ -9,25 +11,34 @@ impl Vertex {
         ]
     }
     pub fn vertex_attrib_pointers() {
+        let stride = mem::size_of::<Self>();
+
+        let location = 0;
+        let offset = 0;
+
         unsafe {
             gl::EnableVertexAttribArray(0);
             gl::VertexAttribPointer(
-                0,
+                location,
                 3,
                 gl::FLOAT,
                 gl::FALSE,
-                (6 * std::mem::size_of::<f32>()) as gl::types::GLint,
-                std::ptr::null(),
+                stride as gl::types::GLint,
+                offset as *const gl::types::GLvoid,
             );
+        }
+        let location = 1;
+        let offset = 3 * std::mem::size_of::<f32>();
 
+        unsafe {
             gl::EnableVertexAttribArray(1);
             gl::VertexAttribPointer(
-                1,
+                location,
                 3,
                 gl::FLOAT,
                 gl::FALSE,
-                (6 * std::mem::size_of::<f32>()) as gl::types::GLint,
-                (3 * std::mem::size_of::<f32>()) as *const gl::types::GLvoid,
+                stride as gl::types::GLint,
+                offset as *const gl::types::GLvoid,
             );
         }
     }
