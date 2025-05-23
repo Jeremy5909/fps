@@ -4,7 +4,7 @@ use program::Program;
 use sdl2::event::Event;
 use shader::Shader;
 use vao::VAO;
-use vbo::VBO;
+use vbo::{VBO, Vertex};
 
 mod program;
 mod shader;
@@ -41,10 +41,19 @@ fn main() {
     let shader_program = Program::from_shaders(&[vert_shader, frag_shader]).unwrap();
     shader_program.set_used();
 
-    let vbo = VBO::from_verts(vec![
-        0.5, -0.5, 0.0, /**/ 1.0, 0.0, 0.0, // bottom right
-        -0.5, -0.5, 0.0, /**/ 0.0, 1.0, 0.0, // top left
-        0.0, 0.5, 0.0, /**/ 0.0, 0.0, 1.0, // top right
+    let vbo = VBO::from_vertices(vec![
+        Vertex {
+            pos: (0.5, -0.5, 0.0),
+            col: (1.0, 0.0, 0.0),
+        },
+        Vertex {
+            pos: (-0.5, -0.5, 0.0),
+            col: (0.0, 1.0, 0.0),
+        },
+        Vertex {
+            pos: (0.0, 0.5, 0.0),
+            col: (0.0, 0.0, 1.0),
+        },
     ]);
     vbo.bind();
 
