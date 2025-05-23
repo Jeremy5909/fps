@@ -1,5 +1,8 @@
 use std::mem;
+use vertex_derive::VertexAttribPointers;
 
+#[repr(C)]
+#[derive(VertexAttribPointers)]
 pub struct Vertex {
     pub pos: (f32, f32, f32),
     pub col: (f32, f32, f32),
@@ -23,14 +26,6 @@ impl Vertex {
             );
         }
     }
-    pub fn vertex_attrib_pointers() {
-        let stride = mem::size_of::<Self>();
-
-        unsafe {
-            Self::vertex_attrib_pointer(stride, 0, 0);
-            Self::vertex_attrib_pointer(stride, 1, 3 * std::mem::size_of::<f32>());
-        }
-    }
 }
 
 pub struct VBO {
@@ -46,9 +41,6 @@ impl VBO {
         let mut id: gl::types::GLuint = 0;
         unsafe { gl::GenBuffers(1, &mut id) };
         Self { vertices, id }
-    }
-    pub fn id(&self) -> gl::types::GLuint {
-        self.id
     }
     pub fn bind(&self) {
         unsafe {

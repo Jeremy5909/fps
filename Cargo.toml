@@ -4,5 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+vertex_derive = { path = "vertex_derive" }
 gl = "0.14.0"
 sdl2 = "0.37.0"
