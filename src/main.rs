@@ -50,29 +50,8 @@ fn main() {
     unsafe { gl::GenVertexArrays(1, &mut id) };
     unsafe { gl::BindVertexArray(id) };
 
-    unsafe {
-        gl::BindBuffer(gl::ARRAY_BUFFER, id);
-        gl::EnableVertexAttribArray(0);
-        gl::VertexAttribPointer(
-            0,
-            3,
-            gl::FLOAT,
-            gl::FALSE,
-            (6 * std::mem::size_of::<f32>()) as gl::types::GLint,
-            std::ptr::null(),
-        );
-
-        gl::BindBuffer(gl::ARRAY_BUFFER, id);
-        gl::EnableVertexAttribArray(1);
-        gl::VertexAttribPointer(
-            1,
-            3,
-            gl::FLOAT,
-            gl::FALSE,
-            (6 * std::mem::size_of::<f32>()) as gl::types::GLint,
-            (3 * std::mem::size_of::<f32>()) as *const gl::types::GLvoid,
-        );
-    }
+    unsafe { gl::BindBuffer(gl::ARRAY_BUFFER, id) };
+    Vertex::vertex_attrib_pointers();
 
     VAO::unbind();
     VBO::unbind();
