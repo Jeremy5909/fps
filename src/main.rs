@@ -50,7 +50,7 @@ fn main() {
     let vao = VAO::new();
     vao.bind();
 
-    vao.link_attribute(
+    VAO::link_attribute(
         vbo.id(),
         0,
         3,
@@ -58,7 +58,7 @@ fn main() {
         (6 * std::mem::size_of::<f32>()) as gl::types::GLint,
         std::ptr::null(),
     );
-    vao.link_attribute(
+    VAO::link_attribute(
         vbo.id(),
         1,
         3,
@@ -66,8 +66,8 @@ fn main() {
         (6 * std::mem::size_of::<f32>()) as gl::types::GLint,
         (3 * std::mem::size_of::<f32>()) as *const gl::types::GLvoid,
     );
-    vao.unbind();
-    vbo.unbind();
+    VAO::unbind();
+    VBO::unbind();
 
     unsafe {
         gl::Viewport(0, 0, 900, 700);

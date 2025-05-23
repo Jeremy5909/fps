@@ -17,7 +17,6 @@ impl VAO {
         }
     }
     pub fn link_attribute(
-        &self,
         vbo: gl::types::GLuint,
         layout: gl::types::GLuint,
         num_components: gl::types::GLint,
@@ -31,7 +30,7 @@ impl VAO {
             gl::VertexAttribPointer(layout, num_components, data_type, gl::FALSE, stride, offset);
         }
     }
-    pub fn unbind(&self) {
+    pub fn unbind() {
         unsafe { gl::BindVertexArray(0) };
     }
 

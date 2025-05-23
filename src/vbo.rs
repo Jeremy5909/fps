@@ -38,7 +38,7 @@ impl VBO {
             );
         }
     }
-    pub fn unbind(&self) {
+    pub fn unbind() {
         unsafe { gl::BindBuffer(gl::ARRAY_BUFFER, 0) };
     }
 }
