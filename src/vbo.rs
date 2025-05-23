@@ -10,16 +10,11 @@ impl Vertex {
             self.pos.0, self.pos.1, self.pos.2, self.col.0, self.col.1, self.col.2,
         ]
     }
-    pub fn vertex_attrib_pointers() {
-        let stride = mem::size_of::<Self>();
-
-        let location = 0;
-        let offset = 0;
-
+    pub unsafe fn vertex_attrib_pointer(stride: usize, location: usize, offset: usize) {
         unsafe {
-            gl::EnableVertexAttribArray(0);
+            gl::EnableVertexAttribArray(location as gl::types::GLuint);
             gl::VertexAttribPointer(
-                location,
+                location as gl::types::GLuint,
                 3,
                 gl::FLOAT,
                 gl::FALSE,
@@ -27,19 +22,13 @@ impl Vertex {
                 offset as *const gl::types::GLvoid,
             );
         }
-        let location = 1;
-        let offset = 3 * std::mem::size_of::<f32>();
+    }
+    pub fn vertex_attrib_pointers() {
+        let stride = mem::size_of::<Self>();
 
         unsafe {
-            gl::EnableVertexAttribArray(1);
-            gl::VertexAttribPointer(
-                location,
-                3,
-                gl::FLOAT,
-                gl::FALSE,
-                stride as gl::types::GLint,
-                offset as *const gl::types::GLvoid,
-            );
+            Self::vertex_attrib_pointer(stride, 0, 0);
+            Self::vertex_attrib_pointer(stride, 1, 3 * std::mem::size_of::<f32>());
         }
     }
 }
