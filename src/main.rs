@@ -17,7 +17,7 @@ fn main() {
 
     let gl_attr = video.gl_attr();
     gl_attr.set_context_profile(sdl2::video::GLProfile::Core);
-    gl_attr.set_context_version(4, 5);
+    gl_attr.set_context_version(3, 1);
 
     let window = video
         .window("fps", 900, 700)
@@ -25,20 +25,10 @@ fn main() {
         .resizable()
         .build()
         .unwrap();
-    let gl_context = window.gl_create_context().unwrap();
-    let gl = gl::load_with(|s| video.gl_get_proc_address(s) as *const c_void);
+    let _gl_context = window.gl_create_context().unwrap();
+    let _gl = gl::load_with(|s| video.gl_get_proc_address(s) as *const c_void);
 
-    let vert_shader = Shader::from_source(
-        &CString::new(include_str!("triangle.vert")).unwrap(),
-        gl::VERTEX_SHADER,
-    )
-    .unwrap();
-    let frag_shader = Shader::from_source(
-        &CString::new(include_str!("triangle.frag")).unwrap(),
-        gl::FRAGMENT_SHADER,
-    )
-    .unwrap();
-    let shader_program = Program::from_shaders(&[vert_shader, frag_shader]).unwrap();
+    let shader_program = Program::from_name("triangle").unwrap();
     shader_program.set_used();
 
     let vbo = VBO::from_vertices(vec![

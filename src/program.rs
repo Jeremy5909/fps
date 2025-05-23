@@ -1,3 +1,5 @@
+use std::{ffi::CString, fs};
+
 use crate::{shader::Shader, whitespace_cstring_with_len};
 
 pub struct Program {
@@ -39,6 +41,20 @@ impl Program {
         }
 
         Ok(Program { id: program_id })
+    }
+    pub fn from_name(name: &str) -> Result<Program, String> {
+        let vert_source = fs::read_to_string(format!("{}.vert", name))
+            .map_err(|_| format!("File {}.vert not found", name))?;
+        let frag_source = fs::read_to_string(format!("{}.frag", name))
+            .map_err(|_| format!("File {}.frag not found", name))?;
+
+        let vert_cstring = CString::new(vert_source).map_err(|e| format!("{e}"))?;
+        let frag_cstring = CString::new(frag_source).map_err(|e| format!("{e}"))?;
+
+        let vert = Shader::from_source(&vert_cstring, gl::VERTEX_SHADER)?;
+        let frag = Shader::from_source(&frag_cstring, gl::FRAGMENT_SHADER)?;
+
+        Self::from_shaders(&[vert, frag])
     }
     pub fn id(&self) -> gl::types::GLuint {
         self.id
