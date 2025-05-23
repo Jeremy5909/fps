@@ -2,7 +2,6 @@ use std::{ffi::CString, os::raw::c_void};
 
 use program::Program;
 use sdl2::event::Event;
-use shader::Shader;
 use vao::VAO;
 use vbo::{VBO, Vertex};
 
@@ -47,25 +46,34 @@ fn main() {
     ]);
     vbo.bind();
 
-    let vao = VAO::new();
-    vao.bind();
+    let mut id: gl::types::GLuint = 0;
+    unsafe { gl::GenVertexArrays(1, &mut id) };
+    unsafe { gl::BindVertexArray(id) };
 
-    VAO::link_attribute(
-        vbo.id(),
-        0,
-        3,
-        gl::FLOAT,
-        (6 * std::mem::size_of::<f32>()) as gl::types::GLint,
-        std::ptr::null(),
-    );
-    VAO::link_attribute(
-        vbo.id(),
-        1,
-        3,
-        gl::FLOAT,
-        (6 * std::mem::size_of::<f32>()) as gl::types::GLint,
-        (3 * std::mem::size_of::<f32>()) as *const gl::types::GLvoid,
-    );
+    unsafe {
+        gl::BindBuffer(gl::ARRAY_BUFFER, id);
+        gl::EnableVertexAttribArray(0);
+        gl::VertexAttribPointer(
+            0,
+            3,
+            gl::FLOAT,
+            gl::FALSE,
+            (6 * std::mem::size_of::<f32>()) as gl::types::GLint,
+            std::ptr::null(),
+        );
+
+        gl::BindBuffer(gl::ARRAY_BUFFER, id);
+        gl::EnableVertexAttribArray(1);
+        gl::VertexAttribPointer(
+            1,
+            3,
+            gl::FLOAT,
+            gl::FALSE,
+            (6 * std::mem::size_of::<f32>()) as gl::types::GLint,
+            (3 * std::mem::size_of::<f32>()) as *const gl::types::GLvoid,
+        );
+    }
+
     VAO::unbind();
     VBO::unbind();
 
@@ -84,7 +92,7 @@ fn main() {
         }
         unsafe {
             gl::Clear(gl::COLOR_BUFFER_BIT);
-            gl::BindVertexArray(vao.id());
+            gl::BindVertexArray(id);
             gl::DrawArrays(gl::TRIANGLES, 0, 3);
         }
         window.gl_swap_window();
