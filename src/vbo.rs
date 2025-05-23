@@ -32,7 +32,7 @@ impl VBO {
             gl::BindBuffer(gl::ARRAY_BUFFER, self.id);
             gl::BufferData(
                 gl::ARRAY_BUFFER,
-                (self.vertices.len() * std::mem::size_of::<f32>()) as gl::types::GLsizeiptr,
+                (self.vertices.len() * std::mem::size_of::<Vertex>()) as gl::types::GLsizeiptr,
                 self.vertices.as_ptr() as *const gl::types::GLvoid,
                 gl::STATIC_DRAW,
             );
