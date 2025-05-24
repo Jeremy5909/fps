@@ -32,7 +32,7 @@ pub struct Triangle {
 }
 
 impl Triangle {
-    pub fn new() -> Result<Triangle, String> {
+    pub fn new() -> Result<Self, String> {
         let program = Program::from_name("triangle")?;
         let vertices = vec![
             Vertex {
@@ -59,7 +59,7 @@ impl Triangle {
         Vertex::vertex_attrib_pointers();
         vbo.unbind();
         vao.unbind();
-        Ok(Triangle {
+        Ok(Self {
             program,
             _vbo: vbo,
             vao,
