@@ -1,0 +1,7 @@
+[package]
+name = "vertex_attrib"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+vertex_attrib_derive = { path = "vertex_attrib_derive"}

@@ -1,13 +1,12 @@
-use crate::{buffer::ArrayBuffer, program::Program, vertex_arrray::VertexArray};
-use vertex_derive::VertexAttribPointers;
+use crate::{
+    VertexAttribPointers, buffer::ArrayBuffer, program::Program, vertex_arrray::VertexArray,
+};
 
 #[repr(C)]
 #[derive(VertexAttribPointers)]
 pub struct Vertex {
     #[location = 0]
     pub pos: (f32, f32, f32),
-    #[location = 1]
-    pub col: (f32, f32, f32),
 }
 impl Vertex {
     pub unsafe fn vertex_attrib_pointer(stride: usize, location: usize, offset: usize) {
@@ -32,22 +31,8 @@ pub struct Triangle {
 }
 
 impl Triangle {
-    pub fn new() -> Result<Self, String> {
-        let program = Program::from_name("shaders/triangle")?;
-        let vertices = vec![
-            Vertex {
-                pos: (0.5, -0.5, 0.0),
-                col: (1.0, 0.0, 0.0),
-            },
-            Vertex {
-                pos: (-0.5, -0.5, 0.0),
-                col: (0.0, 1.0, 0.0),
-            },
-            Vertex {
-                pos: (0.0, 0.5, 0.0),
-                col: (0.0, 0.0, 1.0),
-            },
-        ];
+    pub fn new(vertices: Vec<Vertex>) -> Result<Self, String> {
+        let program = Program::from_name("shaders/white")?;
         let vbo = ArrayBuffer::new();
         vbo.bind();
         vbo.static_draw_data(&vertices);

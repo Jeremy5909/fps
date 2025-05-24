@@ -21,11 +21,11 @@ fn generate_impl(input: &DeriveInput) -> proc_macro2::TokenStream {
     let fields_vertex_attrib_pointer = generate_vertex_attrib_pointer(&input.data);
 
     quote! {
-        impl #impl_generics #ident #ty_generics #where_clause {
+        impl #impl_generics vertex_attrib::VertexAttribPointers for #ident #ty_generics #where_clause {
             #[allow(unused_variables)]
-            pub fn vertex_attrib_pointers() {
+            fn vertex_attrib_pointers() {
                 let stride = ::std::mem::size_of::<Self>();
-                let offset = 0;
+                let mut offset = 0;
 
                 #(#fields_vertex_attrib_pointer)*
             }
@@ -83,7 +83,7 @@ fn generate_struct_field_vertex_attrib_pointer_call(
         unsafe {
             Vertex::vertex_attrib_pointer(stride, location, offset);
         }
-        let offset = offset + ::std::mem::size_of::<#ty>();
+        offset += ::std::mem::size_of::<#ty>();
     }
 }
 
