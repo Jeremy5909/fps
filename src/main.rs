@@ -1,10 +1,12 @@
 use std::{ffi::CString, os::raw::c_void};
 
+use color_buffer::ColorBuffer;
 use sdl2::event::Event;
 use triangle::Triangle;
 use viewport::Viewport;
 
 mod buffer;
+mod color_buffer;
 mod program;
 mod shader;
 mod triangle;
@@ -30,10 +32,9 @@ fn main() {
 
     let triangle = Triangle::new().unwrap();
     let mut viewport = Viewport::for_window(900, 800);
+    let color_buffer = ColorBuffer::from_color(nalgebra::Vector3::new(0.3, 0.5, 1.0));
 
-    unsafe {
-        gl::ClearColor(0.3, 0.3, 0.5, 1.0);
-    }
+    color_buffer.set_used();
 
     let mut event_pump = sdl.event_pump().unwrap();
     'main: loop {
@@ -51,7 +52,7 @@ fn main() {
             }
         }
         unsafe {
-            gl::Clear(gl::COLOR_BUFFER_BIT);
+            color_buffer.clear();
             triangle.render();
             gl::DrawArrays(gl::TRIANGLES, 0, 3);
         }

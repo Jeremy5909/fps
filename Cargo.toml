@@ -7,3 +7,4 @@ edition = "2024"
 vertex_derive = { path = "vertex_derive" }
 gl = "0.14.0"
 sdl2 = "0.37.0"
+nalgebra = "0.33.2"
