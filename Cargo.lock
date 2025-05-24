@@ -256,7 +256,7 @@ dependencies = [
  "image",
  "nalgebra",
  "sdl2",
- "vertex_derive",
+ "vertex_attrib",
 ]
 
 [[package]]
@@ -1066,7 +1066,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "852e951cb7832cb45cb1169900d19760cfa39b82bc0ea9c0e5a14ae88411c98b"
 
 [[package]]
-name = "vertex_derive"
+name = "vertex_attrib"
+version = "0.1.0"
+dependencies = [
+ "vertex_attrib_derive",
+]
+
+[[package]]
+name = "vertex_attrib_derive"
 version = "0.1.0"
 dependencies = [
  "proc-macro2",

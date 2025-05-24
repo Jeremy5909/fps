@@ -1,21 +1,43 @@
 use std::{ffi::CString, os::raw::c_void};
 
 use color_buffer::ColorBuffer;
+use element::Element;
+use program::Program;
 use sdl2::event::Event;
-use textured_square::TexturedSquare;
-use triangle::Triangle;
+use vertex_attrib::VertexAttribPointers;
 use viewport::Viewport;
 
 mod buffer;
 mod color_buffer;
+mod element;
 mod program;
 mod shader;
-mod square;
 mod texture;
-mod textured_square;
 mod triangle;
 mod vertex_arrray;
 mod viewport;
+
+#[repr(C)]
+#[derive(VertexAttribPointers)]
+pub struct Vertex {
+    #[location = 0]
+    pub pos: (f32, f32),
+}
+impl Vertex {
+    pub unsafe fn vertex_attrib_pointer(stride: usize, location: usize, offset: usize) {
+        unsafe {
+            gl::EnableVertexAttribArray(location as gl::types::GLuint);
+            gl::VertexAttribPointer(
+                location as gl::types::GLuint,
+                3,
+                gl::FLOAT,
+                gl::FALSE,
+                stride as gl::types::GLint,
+                offset as *const gl::types::GLvoid,
+            );
+        }
+    }
+}
 
 fn main() {
     let sdl = sdl2::init().unwrap();
@@ -34,7 +56,17 @@ fn main() {
     let _gl_context = window.gl_create_context().unwrap();
     let _gl = gl::load_with(|s| video.gl_get_proc_address(s) as *const c_void);
 
-    let square = TexturedSquare::new().unwrap();
+    let square = Element::new(
+        vec![
+            Vertex { pos: (-0.5, -0.5) },
+            Vertex { pos: (0.5, -0.5) },
+            Vertex { pos: (0.5, 0.5) },
+            Vertex { pos: (-0.5, 0.5) },
+        ],
+        vec![0, 1, 2, 2, 3, 0],
+        Program::from_name("shaders/white").unwrap(),
+    )
+    .unwrap();
     let mut viewport = Viewport::for_window(900, 800);
     let color_buffer = ColorBuffer::from_color(nalgebra::Vector3::new(0.3, 0.5, 1.0));
 
