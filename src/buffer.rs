@@ -1,31 +1,5 @@
 use std::marker;
 
-use vertex_derive::VertexAttribPointers;
-
-#[repr(C)]
-#[derive(VertexAttribPointers)]
-pub struct Vertex {
-    #[location = 0]
-    pub pos: (f32, f32, f32),
-    #[location = 1]
-    pub col: (f32, f32, f32),
-}
-impl Vertex {
-    pub unsafe fn vertex_attrib_pointer(stride: usize, location: usize, offset: usize) {
-        unsafe {
-            gl::EnableVertexAttribArray(location as gl::types::GLuint);
-            gl::VertexAttribPointer(
-                location as gl::types::GLuint,
-                3,
-                gl::FLOAT,
-                gl::FALSE,
-                stride as gl::types::GLint,
-                offset as *const gl::types::GLvoid,
-            );
-        }
-    }
-}
-
 pub trait BufferType {
     const BUFFER_TYPE: gl::types::GLuint;
 }
