@@ -25,17 +25,17 @@ impl Vertex {
 }
 
 pub struct ArrayBuffer {
-    id: gl::types::GLuint,
+    vbo: gl::types::GLuint,
 }
 impl ArrayBuffer {
     pub fn new() -> Self {
         let mut id: gl::types::GLuint = 0;
         unsafe { gl::GenBuffers(1, &mut id) };
-        Self { id }
+        Self { vbo: id }
     }
     pub fn bind(&self) {
         unsafe {
-            gl::BindBuffer(gl::ARRAY_BUFFER, self.id);
+            gl::BindBuffer(gl::ARRAY_BUFFER, self.vbo);
         }
     }
     pub fn static_draw_data<T>(&self, data: &[T]) {
@@ -55,7 +55,7 @@ impl ArrayBuffer {
 impl Drop for ArrayBuffer {
     fn drop(&mut self) {
         unsafe {
-            gl::DeleteBuffers(1, &mut self.id);
+            gl::DeleteBuffers(1, &mut self.vbo);
         }
     }
 }

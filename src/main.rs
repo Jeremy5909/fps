@@ -4,10 +4,12 @@ use std::{ffi::CString, os::raw::c_void};
 use array_buffer::ArrayBuffer;
 use program::Program;
 use sdl2::event::Event;
+use vertex_arrray::VertexArray;
 
 mod array_buffer;
 mod program;
 mod shader;
+mod vertex_arrray;
 
 fn main() {
     let sdl = sdl2::init().unwrap();
@@ -49,16 +51,12 @@ fn main() {
     vbo.static_draw_data(&vertices);
     vbo.unbind();
 
-    let mut vao: gl::types::GLuint = 0;
-    unsafe {
-        gl::GenVertexArrays(1, &mut vao);
-
-        gl::BindVertexArray(vao);
-        vbo.bind();
-        Vertex::vertex_attrib_pointers();
-        vbo.unbind();
-        gl::BindVertexArray(0);
-    }
+    let vao = VertexArray::new();
+    vao.bind();
+    vbo.bind();
+    Vertex::vertex_attrib_pointers();
+    vbo.unbind();
+    vao.unbind();
 
     unsafe {
         gl::Viewport(0, 0, 900, 700);
@@ -75,7 +73,7 @@ fn main() {
         }
         unsafe {
             gl::Clear(gl::COLOR_BUFFER_BIT);
-            gl::BindVertexArray(vao);
+            vao.bind();
             gl::DrawArrays(gl::TRIANGLES, 0, 3);
         }
         window.gl_swap_window();
