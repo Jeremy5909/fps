@@ -39,32 +39,36 @@ fn generate_vertex_attrib_pointer(data: &syn::Data) -> Vec<proc_macro2::TokenStr
                 .iter()
                 .map(generate_struct_field_vertex_attrib_pointer_call)
                 .collect(),
-            _ => panic!(),
+            _ => panic!("VertexAttribPointers can only be implemented for named structs"),
         },
-        _ => panic!(),
+        _ => panic!("VertexAttribPointers can only be implemented for named structs"),
     }
 }
 
 fn generate_struct_field_vertex_attrib_pointer_call(
     field: &syn::Field,
 ) -> proc_macro2::TokenStream {
-    let field_name = field.ident.as_ref().map(|i| i.to_string()).unwrap();
+    let field_name = field
+        .ident
+        .as_ref()
+        .map(|i| i.to_string())
+        .unwrap_or(String::from("<unnamed>"));
     let location_attr = field
         .attrs
         .iter()
         .find(|attr| attr.path().is_ident("location"))
-        .unwrap_or_else(|| panic!("Field {} is missing attribute", field_name));
+        .expect("Field {field_name} is missing #[location=?] attribute");
     let location_value: usize = match location_attr
         .meta
         .require_name_value()
-        .unwrap_or_else(|_| panic!("need name value"))
+        .expect("Field {field_name} location attribute must be in #[location = \"?\" format]")
         .value
     {
         syn::Expr::Lit(ExprLit {
             lit: syn::Lit::Str(ref s),
             ..
         }) => s.value().parse().unwrap(),
-        _ => panic!(),
+        _ => panic!("Field {field_name} must be string literal"),
     };
     let ty = &field.ty;
     quote! {
