@@ -9,6 +9,7 @@ mod buffer;
 mod color_buffer;
 mod program;
 mod shader;
+mod texture;
 mod triangle;
 mod vertex_arrray;
 mod viewport;
