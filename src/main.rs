@@ -2,7 +2,7 @@ use std::{ffi::CString, os::raw::c_void};
 
 use color_buffer::ColorBuffer;
 use sdl2::event::Event;
-use square::Square;
+use textured_square::TexturedSquare;
 use triangle::Triangle;
 use viewport::Viewport;
 
@@ -12,6 +12,7 @@ mod program;
 mod shader;
 mod square;
 mod texture;
+mod textured_square;
 mod triangle;
 mod vertex_arrray;
 mod viewport;
@@ -33,7 +34,7 @@ fn main() {
     let _gl_context = window.gl_create_context().unwrap();
     let _gl = gl::load_with(|s| video.gl_get_proc_address(s) as *const c_void);
 
-    let square = Square::new().unwrap();
+    let square = TexturedSquare::new().unwrap();
     let mut viewport = Viewport::for_window(900, 800);
     let color_buffer = ColorBuffer::from_color(nalgebra::Vector3::new(0.3, 0.5, 1.0));
 

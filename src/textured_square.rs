@@ -3,6 +3,7 @@ use std::ptr;
 use crate::{
     buffer::{ArrayBuffer, ElementBuffer},
     program::Program,
+    texture::Texture,
     vertex_arrray::VertexArray,
 };
 use vertex_derive::VertexAttribPointers;
@@ -12,6 +13,8 @@ use vertex_derive::VertexAttribPointers;
 struct Vertex {
     #[location = 0]
     pos: (f32, f32),
+    #[location = 1]
+    tex_coord: (f32, f32),
 }
 impl Vertex {
     pub unsafe fn vertex_attrib_pointer(stride: usize, location: usize, offset: usize) {
@@ -29,20 +32,33 @@ impl Vertex {
     }
 }
 
-pub struct Square {
+pub struct TexturedSquare {
     program: Program,
     _vbo: ArrayBuffer,
     vao: VertexArray,
+    texture: Texture,
 }
 
-impl Square {
+impl TexturedSquare {
     pub fn new() -> Result<Self, String> {
-        let program = Program::from_name("shaders/square")?;
+        let program = Program::from_name("shaders/textured_square")?;
         let vertices = vec![
-            Vertex { pos: (-0.5, -0.5) },
-            Vertex { pos: (0.5, -0.5) },
-            Vertex { pos: (0.5, 0.5) },
-            Vertex { pos: (-0.5, 0.5) },
+            Vertex {
+                pos: (-0.5, -0.5),
+                tex_coord: (0.0, 1.0),
+            },
+            Vertex {
+                pos: (0.5, -0.5),
+                tex_coord: (1.0, 1.0),
+            },
+            Vertex {
+                pos: (0.5, 0.5),
+                tex_coord: (1.0, 0.0),
+            },
+            Vertex {
+                pos: (-0.5, 0.5),
+                tex_coord: (0.0, 0.0),
+            },
         ];
 
         let indices = vec![0, 1, 2, 2, 3, 0];
@@ -64,13 +80,22 @@ impl Square {
         vbo.unbind();
         ebo.unbind();
 
+        let texture = Texture::new();
+        texture.load("brick_wall.jpg").map_err(|e| e.to_string())?;
+        unsafe {
+            gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
+            gl::Enable(gl::BLEND);
+        }
+
         Ok(Self {
             program,
             _vbo: vbo,
             vao,
+            texture,
         })
     }
     pub fn render(&self) {
+        self.texture.bind();
         self.program.set_used();
         self.vao.bind();
         unsafe {
