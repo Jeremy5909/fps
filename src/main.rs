@@ -2,12 +2,14 @@ use std::{ffi::CString, os::raw::c_void};
 
 use sdl2::event::Event;
 use triangle::Triangle;
+use viewport::Viewport;
 
 mod buffer;
 mod program;
 mod shader;
 mod triangle;
 mod vertex_arrray;
+mod viewport;
 
 fn main() {
     let sdl = sdl2::init().unwrap();
@@ -27,9 +29,9 @@ fn main() {
     let _gl = gl::load_with(|s| video.gl_get_proc_address(s) as *const c_void);
 
     let triangle = Triangle::new().unwrap();
+    let mut viewport = Viewport::for_window(900, 800);
 
     unsafe {
-        gl::Viewport(0, 0, 900, 700);
         gl::ClearColor(0.3, 0.3, 0.5, 1.0);
     }
 
@@ -38,6 +40,13 @@ fn main() {
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit { .. } => break 'main,
+                Event::Window {
+                    win_event: sdl2::event::WindowEvent::Resized(w, h),
+                    ..
+                } => {
+                    viewport.update_size(w, h);
+                    viewport.set_used();
+                }
                 _ => {}
             }
         }
