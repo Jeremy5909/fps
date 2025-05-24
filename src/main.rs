@@ -1,14 +1,13 @@
+use crate::array_buffer::Vertex;
 use std::{ffi::CString, os::raw::c_void};
 
+use array_buffer::ArrayBuffer;
 use program::Program;
 use sdl2::event::Event;
-use vao::VAO;
-use vbo::{VBO, Vertex};
 
+mod array_buffer;
 mod program;
 mod shader;
-mod vao;
-mod vbo;
 
 fn main() {
     let sdl = sdl2::init().unwrap();
@@ -30,7 +29,7 @@ fn main() {
     let shader_program = Program::from_name("triangle").unwrap();
     shader_program.set_used();
 
-    let vbo = VBO::from_vertices(vec![
+    let vertices = vec![
         Vertex {
             pos: (0.5, -0.5, 0.0),
             col: (1.0, 0.0, 0.0),
@@ -43,18 +42,23 @@ fn main() {
             pos: (0.0, 0.5, 0.0),
             col: (0.0, 0.0, 1.0),
         },
-    ]);
+    ];
+
+    let vbo = ArrayBuffer::new();
     vbo.bind();
+    vbo.static_draw_data(&vertices);
+    vbo.unbind();
 
-    let mut id: gl::types::GLuint = 0;
-    unsafe { gl::GenVertexArrays(1, &mut id) };
-    unsafe { gl::BindVertexArray(id) };
+    let mut vao: gl::types::GLuint = 0;
+    unsafe {
+        gl::GenVertexArrays(1, &mut vao);
 
-    unsafe { gl::BindBuffer(gl::ARRAY_BUFFER, id) };
-    Vertex::vertex_attrib_pointers();
-
-    VAO::unbind();
-    VBO::unbind();
+        gl::BindVertexArray(vao);
+        vbo.bind();
+        Vertex::vertex_attrib_pointers();
+        vbo.unbind();
+        gl::BindVertexArray(0);
+    }
 
     unsafe {
         gl::Viewport(0, 0, 900, 700);
@@ -71,7 +75,7 @@ fn main() {
         }
         unsafe {
             gl::Clear(gl::COLOR_BUFFER_BIT);
-            gl::BindVertexArray(id);
+            gl::BindVertexArray(vao);
             gl::DrawArrays(gl::TRIANGLES, 0, 3);
         }
         window.gl_swap_window();
