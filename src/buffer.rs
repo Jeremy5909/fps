@@ -1,7 +1,7 @@
 use std::marker;
 
 pub trait BufferType {
-    const BUFFER_TYPE: gl::types::GLuint;
+    const BUFFER_TYPE: gl::types::GLenum;
 }
 
 pub struct Buffer<B: BufferType> {
@@ -19,13 +19,13 @@ impl<B: BufferType> Buffer<B> {
     }
     pub fn bind(&self) {
         unsafe {
-            gl::BindBuffer(gl::ARRAY_BUFFER, self.vbo);
+            gl::BindBuffer(B::BUFFER_TYPE, self.vbo);
         }
     }
     pub fn static_draw_data<T>(&self, data: &[T]) {
         unsafe {
             gl::BufferData(
-                gl::ARRAY_BUFFER,
+                B::BUFFER_TYPE,
                 (data.len() * std::mem::size_of::<T>()) as gl::types::GLsizeiptr,
                 data.as_ptr() as *const gl::types::GLvoid,
                 gl::STATIC_DRAW,
@@ -33,7 +33,7 @@ impl<B: BufferType> Buffer<B> {
         };
     }
     pub fn unbind(&self) {
-        unsafe { gl::BindBuffer(gl::ARRAY_BUFFER, 0) };
+        unsafe { gl::BindBuffer(B::BUFFER_TYPE, 0) };
     }
 }
 impl<B> Drop for Buffer<B>
@@ -49,12 +49,12 @@ where
 
 pub struct BufferTypeArray;
 impl BufferType for BufferTypeArray {
-    const BUFFER_TYPE: gl::types::GLuint = gl::ARRAY_BUFFER;
+    const BUFFER_TYPE: gl::types::GLenum = gl::ARRAY_BUFFER;
 }
 pub struct BufferTypeElementArray;
 impl BufferType for BufferTypeElementArray {
-    const BUFFER_TYPE: gl::types::GLuint = gl::ELEMENT_ARRAY_BUFFER;
+    const BUFFER_TYPE: gl::types::GLenum = gl::ELEMENT_ARRAY_BUFFER;
 }
 
 pub type ArrayBuffer = Buffer<BufferTypeArray>;
-pub type ElementArrayBuffer = Buffer<BufferTypeElementArray>;
+pub type ElementBuffer = Buffer<BufferTypeElementArray>;
