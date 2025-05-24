@@ -33,7 +33,7 @@ pub struct Triangle {
 
 impl Triangle {
     pub fn new() -> Result<Self, String> {
-        let program = Program::from_name("triangle")?;
+        let program = Program::from_name("shaders/triangle")?;
         let vertices = vec![
             Vertex {
                 pos: (0.5, -0.5, 0.0),
