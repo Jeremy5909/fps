@@ -65,10 +65,13 @@ fn generate_struct_field_vertex_attrib_pointer_call(
         .value
     {
         syn::Expr::Lit(ExprLit {
-            lit: syn::Lit::Str(ref s),
+            lit: syn::Lit::Int(ref s),
             ..
-        }) => s.value().parse().unwrap(),
-        _ => panic!("Field {field_name} must be string literal"),
+        }) => s.base10_parse().expect(
+            format!("Expected integer literal in #[location = ?] form on field {field_name}")
+                .as_str(),
+        ),
+        _ => panic!("Attribute must be in #[location = ?] form on field {field_name}"),
     };
     let ty = &field.ty;
     quote! {

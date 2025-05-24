@@ -3,9 +3,9 @@ use vertex_derive::VertexAttribPointers;
 #[repr(C)]
 #[derive(VertexAttribPointers)]
 pub struct Vertex {
-    #[location = "0"]
+    #[location = 0]
     pub pos: (f32, f32, f32),
-    #[location = "1"]
+    #[location = 1]
     pub col: (f32, f32, f32),
 }
 impl Vertex {
