@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::DeriveInput;
@@ -39,9 +41,9 @@ fn generate_vertex_attrib_pointer(data: &syn::Data) -> Vec<proc_macro2::TokenStr
                 .iter()
                 .map(generate_struct_field_vertex_attrib_pointer_call)
                 .collect(),
-            _ => panic!("VertexAttribPointers can only be implemented for named structs"),
+            _ => Err(Error::NotNamedStruct).unwrap(),
         },
-        _ => panic!("VertexAttribPointers can only be implemented for named structs"),
+        _ => Err(Error::NotNamedStruct).unwrap(),
     }
 }
 
@@ -57,21 +59,23 @@ fn generate_struct_field_vertex_attrib_pointer_call(
         .attrs
         .iter()
         .find(|attr| attr.path().is_ident("location"))
-        .expect("Field {field_name} is missing #[location=?] attribute");
+        .ok_or(Error::AttributeMissing(field_name.clone()))
+        .unwrap();
     let location_value: usize = match location_attr
         .meta
         .require_name_value()
-        .expect("Field {field_name} location attribute must be in #[location = \"?\" format]")
+        .map_err(|_| Error::AttributeFormatIncorrect(field_name.clone()))
+        .unwrap()
         .value
     {
         syn::Expr::Lit(ExprLit {
             lit: syn::Lit::Int(ref s),
             ..
-        }) => s.base10_parse().expect(
-            format!("Expected integer literal in #[location = ?] form on field {field_name}")
-                .as_str(),
-        ),
-        _ => panic!("Attribute must be in #[location = ?] form on field {field_name}"),
+        }) => s
+            .base10_parse()
+            .map_err(|_| Error::AttributeExpectedIntLiteral(field_name.clone()))
+            .unwrap(),
+        _ => Err(Error::AttributeExpectedIntLiteral(field_name.clone())).unwrap(),
     };
     let ty = &field.ty;
     quote! {
@@ -80,5 +84,32 @@ fn generate_struct_field_vertex_attrib_pointer_call(
             Vertex::vertex_attrib_pointer(stride, location, offset);
         }
         let offset = offset + ::std::mem::size_of::<#ty>();
+    }
+}
+
+enum Error {
+    AttributeMissing(String),
+    AttributeFormatIncorrect(String),
+    AttributeExpectedIntLiteral(String),
+    NotNamedStruct,
+}
+impl Debug for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self {
+            &Self::AttributeMissing(field_name) => {
+                write!(f, "Field '{field_name}' missing attribute #[location = ..]")
+            }
+            &Self::AttributeFormatIncorrect(field_name) => write!(
+                f,
+                "Attribute in field '{field_name}' doesn't have form #[location = ..]"
+            ),
+            &Self::AttributeExpectedIntLiteral(field_name) => {
+                write!(f, "Field '{field_name}' pos must be int")
+            }
+            &Self::NotNamedStruct => write!(
+                f,
+                "VertexAttribPointers can only be implemented for named structs"
+            ),
+        }
     }
 }
