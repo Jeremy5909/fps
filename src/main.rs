@@ -1,14 +1,12 @@
-use crate::buffer::Vertex;
 use std::{ffi::CString, os::raw::c_void};
 
-use buffer::ArrayBuffer;
-use program::Program;
 use sdl2::event::Event;
-use vertex_arrray::VertexArray;
+use triangle::Triangle;
 
 mod buffer;
 mod program;
 mod shader;
+mod triangle;
 mod vertex_arrray;
 
 fn main() {
@@ -28,35 +26,7 @@ fn main() {
     let _gl_context = window.gl_create_context().unwrap();
     let _gl = gl::load_with(|s| video.gl_get_proc_address(s) as *const c_void);
 
-    let shader_program = Program::from_name("triangle").unwrap();
-    shader_program.set_used();
-
-    let vertices = vec![
-        Vertex {
-            pos: (0.5, -0.5, 0.0),
-            col: (1.0, 0.0, 0.0),
-        },
-        Vertex {
-            pos: (-0.5, -0.5, 0.0),
-            col: (0.0, 1.0, 0.0),
-        },
-        Vertex {
-            pos: (0.0, 0.5, 0.0),
-            col: (0.0, 0.0, 1.0),
-        },
-    ];
-
-    let vbo = ArrayBuffer::new();
-    vbo.bind();
-    vbo.static_draw_data(&vertices);
-    vbo.unbind();
-
-    let vao = VertexArray::new();
-    vao.bind();
-    vbo.bind();
-    Vertex::vertex_attrib_pointers();
-    vbo.unbind();
-    vao.unbind();
+    let triangle = Triangle::new().unwrap();
 
     unsafe {
         gl::Viewport(0, 0, 900, 700);
@@ -73,7 +43,7 @@ fn main() {
         }
         unsafe {
             gl::Clear(gl::COLOR_BUFFER_BIT);
-            vao.bind();
+            triangle.render();
             gl::DrawArrays(gl::TRIANGLES, 0, 3);
         }
         window.gl_swap_window();
