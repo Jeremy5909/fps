@@ -1,12 +1,12 @@
-use crate::array_buffer::Vertex;
+use crate::buffer::Vertex;
 use std::{ffi::CString, os::raw::c_void};
 
-use array_buffer::ArrayBuffer;
+use buffer::ArrayBuffer;
 use program::Program;
 use sdl2::event::Event;
 use vertex_arrray::VertexArray;
 
-mod array_buffer;
+mod buffer;
 mod program;
 mod shader;
 mod vertex_arrray;

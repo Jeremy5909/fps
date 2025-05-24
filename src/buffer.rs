@@ -1,3 +1,5 @@
+use std::marker;
+
 use vertex_derive::VertexAttribPointers;
 
 #[repr(C)]
@@ -24,14 +26,22 @@ impl Vertex {
     }
 }
 
-pub struct ArrayBuffer {
-    vbo: gl::types::GLuint,
+pub trait BufferType {
+    const BUFFER_TYPE: gl::types::GLuint;
 }
-impl ArrayBuffer {
-    pub fn new() -> Self {
+
+pub struct Buffer<B: BufferType> {
+    vbo: gl::types::GLuint,
+    _marker: marker::PhantomData<B>,
+}
+impl<B: BufferType> Buffer<B> {
+    pub fn new() -> Buffer<B> {
         let mut id: gl::types::GLuint = 0;
         unsafe { gl::GenBuffers(1, &mut id) };
-        Self { vbo: id }
+        Self {
+            vbo: id,
+            _marker: marker::PhantomData,
+        }
     }
     pub fn bind(&self) {
         unsafe {
@@ -52,10 +62,25 @@ impl ArrayBuffer {
         unsafe { gl::BindBuffer(gl::ARRAY_BUFFER, 0) };
     }
 }
-impl Drop for ArrayBuffer {
+impl<B> Drop for Buffer<B>
+where
+    B: BufferType,
+{
     fn drop(&mut self) {
         unsafe {
             gl::DeleteBuffers(1, &mut self.vbo);
         }
     }
 }
+
+pub struct BufferTypeArray;
+impl BufferType for BufferTypeArray {
+    const BUFFER_TYPE: gl::types::GLuint = gl::ARRAY_BUFFER;
+}
+pub struct BufferTypeElementArray;
+impl BufferType for BufferTypeElementArray {
+    const BUFFER_TYPE: gl::types::GLuint = gl::ELEMENT_ARRAY_BUFFER;
+}
+
+pub type ArrayBuffer = Buffer<BufferTypeArray>;
+pub type ElementArrayBuffer = Buffer<BufferTypeElementArray>;
