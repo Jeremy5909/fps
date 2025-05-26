@@ -1,3 +1,2 @@
-/target/
-/vertex_attrib/target
-/vertex_attrib/vertex_attrib_derive/target
+target
+**/*/target
