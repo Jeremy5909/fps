@@ -22,8 +22,18 @@ fn whitespace_cstring_with_len(len: usize) -> CString {
 #[derive(VertexAttribPointers)]
 pub struct Vertex {
     #[location = 0]
-    pub pos: (f32, f32),
+    pub pos: (f32, f32, f32),
 }
+
+#[repr(C)]
+#[derive(VertexAttribPointers)]
+pub struct TextureVertex {
+    #[location = 0]
+    pub pos: (f32, f32, f32),
+    #[location = 1]
+    pub tex_coords: (f32, f32),
+}
+
 impl Vertex {
     pub unsafe fn vertex_attrib_pointer(stride: usize, location: usize, offset: usize) {
         unsafe {

@@ -20,7 +20,7 @@ impl Engine {
         gl_attr.set_context_version(3, 1);
 
         let window = video
-            .window(title, 900, 700)
+            .window(title, 800, 800)
             .opengl()
             .resizable()
             .build()

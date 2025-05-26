@@ -22,6 +22,8 @@ impl Texture {
             gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
             gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
 
+            // TODO: Make this work like if theres multiple textures cuz right now only one texture
+            // works even though element has vector
             gl::TexImage2D(
                 gl::TEXTURE_2D,
                 0,
