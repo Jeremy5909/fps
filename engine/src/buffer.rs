@@ -9,7 +9,7 @@ pub struct Buffer<B: BufferType> {
     _marker: marker::PhantomData<B>,
 }
 impl<B: BufferType> Buffer<B> {
-    pub fn new() -> Buffer<B> {
+    pub(crate) fn new() -> Buffer<B> {
         let mut id: gl::types::GLuint = 0;
         unsafe { gl::GenBuffers(1, &mut id) };
         Self {
@@ -17,12 +17,12 @@ impl<B: BufferType> Buffer<B> {
             _marker: marker::PhantomData,
         }
     }
-    pub fn bind(&self) {
+    pub(crate) fn bind(&self) {
         unsafe {
             gl::BindBuffer(B::BUFFER_TYPE, self.vbo);
         }
     }
-    pub fn static_draw_data<T>(&self, data: &[T]) {
+    pub(crate) fn static_draw_data<T>(&self, data: &[T]) {
         unsafe {
             gl::BufferData(
                 B::BUFFER_TYPE,
@@ -32,7 +32,7 @@ impl<B: BufferType> Buffer<B> {
             )
         };
     }
-    pub fn unbind(&self) {
+    pub(crate) fn unbind(&self) {
         unsafe { gl::BindBuffer(B::BUFFER_TYPE, 0) };
     }
 }

@@ -6,7 +6,7 @@ pub struct Program {
     id: gl::types::GLuint,
 }
 impl Program {
-    pub fn from_shaders(shaders: &[Shader]) -> Result<Program, String> {
+    pub(crate) fn from_shaders(shaders: &[Shader]) -> Result<Program, String> {
         let program_id = unsafe { gl::CreateProgram() };
         shaders
             .iter()
@@ -56,10 +56,7 @@ impl Program {
 
         Self::from_shaders(&[vert, frag])
     }
-    pub fn id(&self) -> gl::types::GLuint {
-        self.id
-    }
-    pub fn set_used(&self) {
+    pub(crate) fn set_used(&self) {
         unsafe { gl::UseProgram(self.id) };
     }
 }
