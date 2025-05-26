@@ -1,21 +1,19 @@
-use std::{ffi::CString, os::raw::c_void};
+use std::ffi::CString;
 
-use color_buffer::ColorBuffer;
 use element::Element;
+use engine::Engine;
 use program::Program;
 use sdl2::event::Event;
 use vertex_attrib::VertexAttribPointers;
-use viewport::Viewport;
 
 mod buffer;
-mod color_buffer;
 mod element;
+mod engine;
 mod program;
 mod shader;
 mod texture;
 mod triangle;
 mod vertex_arrray;
-mod viewport;
 
 #[repr(C)]
 #[derive(VertexAttribPointers)]
@@ -40,22 +38,7 @@ impl Vertex {
 }
 
 fn main() {
-    let sdl = sdl2::init().unwrap();
-    let video = sdl.video().unwrap();
-
-    let gl_attr = video.gl_attr();
-    gl_attr.set_context_profile(sdl2::video::GLProfile::Core);
-    gl_attr.set_context_version(3, 1);
-
-    let window = video
-        .window("fps", 900, 700)
-        .opengl()
-        .resizable()
-        .build()
-        .unwrap();
-    let _gl_context = window.gl_create_context().unwrap();
-    let _gl = gl::load_with(|s| video.gl_get_proc_address(s) as *const c_void);
-
+    let mut engine = Engine::new("fps").unwrap();
     let square = Element::new(
         vec![
             Vertex { pos: (-0.5, -0.5) },
@@ -67,29 +50,24 @@ fn main() {
         Program::from_name("shaders/white").unwrap(),
     )
     .unwrap();
-    let mut viewport = Viewport::for_window(900, 800);
-    let color_buffer = ColorBuffer::from_color(nalgebra::Vector3::new(0.3, 0.5, 1.0));
 
-    color_buffer.set_used();
-
-    let mut event_pump = sdl.event_pump().unwrap();
+    engine.clear_color(0.7, 0.5, 1.0);
     'main: loop {
-        for event in event_pump.poll_iter() {
+        for event in engine.events() {
             match event {
                 Event::Quit { .. } => break 'main,
                 Event::Window {
                     win_event: sdl2::event::WindowEvent::Resized(w, h),
                     ..
                 } => {
-                    viewport.update_size(w, h);
-                    viewport.set_used();
+                    engine.update_size(w, h);
                 }
                 _ => {}
             }
         }
-        color_buffer.clear();
+        engine.clear();
         square.render();
-        window.gl_swap_window();
+        engine.swap_window();
     }
 }
 
