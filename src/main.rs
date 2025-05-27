@@ -13,8 +13,8 @@ fn main() {
         for y in [-0.5, 0.5] {
             for x in [-0.5, 0.5] {
                 vertices.push(TextureVertex {
-                    pos: (x, y, z),
-                    tex_coords: (x + 0.5, y + 0.5),
+                    pos: (x, y, z).into(),
+                    tex_coords: (x + 0.5, y + 0.5).into(),
                 });
             }
         }

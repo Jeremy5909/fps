@@ -18,29 +18,15 @@ fn whitespace_cstring_with_len(len: usize) -> CString {
     unsafe { CString::from_vec_unchecked(buffer) }
 }
 
-#[repr(C)]
-#[derive(VertexAttribPointers)]
-pub struct Vertex {
-    #[location = 0]
-    pub pos: (f32, f32, f32),
-}
-
-#[repr(C)]
-#[derive(VertexAttribPointers)]
-pub struct TextureVertex {
-    #[location = 0]
-    pub pos: (f32, f32, f32),
-    #[location = 1]
-    pub tex_coords: (f32, f32),
-}
-
-impl Vertex {
-    pub unsafe fn vertex_attrib_pointer(stride: usize, location: usize, offset: usize) {
+// Even more temporary
+trait VertexAttrib {
+    const COMPONENTS: i32;
+    unsafe fn vertex_attrib_pointer(stride: usize, location: usize, offset: usize) {
         unsafe {
             gl::EnableVertexAttribArray(location as gl::types::GLuint);
             gl::VertexAttribPointer(
                 location as gl::types::GLuint,
-                3,
+                Self::COMPONENTS,
                 gl::FLOAT,
                 gl::FALSE,
                 stride as gl::types::GLint,
@@ -49,3 +35,41 @@ impl Vertex {
         }
     }
 }
+#[repr(transparent)]
+pub struct Vec2(pub (f32, f32));
+impl VertexAttrib for Vec2 {
+    const COMPONENTS: i32 = 2;
+}
+impl From<(f32, f32)> for Vec2 {
+    fn from(value: (f32, f32)) -> Self {
+        Self(value)
+    }
+}
+#[repr(transparent)]
+pub struct Vec3(pub (f32, f32, f32));
+impl VertexAttrib for Vec3 {
+    const COMPONENTS: i32 = 3;
+}
+impl From<(f32, f32, f32)> for Vec3 {
+    fn from(value: (f32, f32, f32)) -> Self {
+        Self(value)
+    }
+}
+
+#[repr(C)]
+#[derive(VertexAttribPointers)]
+pub struct Vertex {
+    #[location = 0]
+    pub pos: Vec3,
+}
+
+#[repr(C)]
+#[derive(VertexAttribPointers)]
+pub struct TextureVertex {
+    #[location = 0]
+    pub pos: Vec3,
+    #[location = 1]
+    pub tex_coords: Vec2,
+}
+
+impl Vertex {}

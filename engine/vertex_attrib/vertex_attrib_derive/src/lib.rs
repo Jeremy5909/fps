@@ -81,7 +81,7 @@ fn generate_struct_field_vertex_attrib_pointer_call(
     quote! {
         let location = #location_value;
         unsafe {
-            Vertex::vertex_attrib_pointer(stride, location, offset);
+            #ty::vertex_attrib_pointer(stride, location, offset);
         }
         offset += ::std::mem::size_of::<#ty>();
     }
