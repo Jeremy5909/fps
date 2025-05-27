@@ -11,7 +11,15 @@ use engine::{
 use nalgebra::Point3;
 
 fn main() {
-    let mut engine = Engine::new("fps").unwrap();
+    let camera = Camera::new(
+        1.0,
+        f32::consts::FRAC_PI_3,
+        0.1,
+        100.0,
+        Point3::new(0.0, 0.0, 3.0),
+    );
+    let mut engine = Engine::new("fps", camera).unwrap();
+
     let mut vertices = Vec::new();
     for z in [-0.5, 0.5] {
         for y in [-0.5, 0.5] {
@@ -50,15 +58,7 @@ fn main() {
     )
     .unwrap();
     cube.add_texture("brick_wall.jpg").unwrap();
-
-    let camera = Camera::new(
-        1.0,
-        f32::consts::FRAC_PI_3,
-        0.1,
-        100.0,
-        Point3::new(0.0, 0.0, 3.0),
-    );
-
+    engine.add_element(cube);
     engine.clear_color(0.7, 0.5, 1.0);
     'main: loop {
         for event in engine.events() {
@@ -74,7 +74,7 @@ fn main() {
             }
         }
         engine.clear();
-        cube.render(&camera);
+        engine.render();
         engine.swap_window();
     }
 }

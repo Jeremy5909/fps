@@ -5,15 +5,17 @@ use sdl2::{
     video::{GLContext, Window},
 };
 
-use crate::camera::Camera;
+use crate::{camera::Camera, element::Element};
 
 pub struct Engine {
     window: Window,
-    gl_context: GLContext,
+    _gl_context: GLContext,
     event_pump: EventPump,
+    camera: Camera,
+    elements: Vec<Element>,
 }
 impl Engine {
-    pub fn new(title: &str) -> Result<Self, String> {
+    pub fn new(title: &str, camera: Camera) -> Result<Self, String> {
         let sdl = sdl2::init()?;
         let video = sdl.video()?;
 
@@ -27,14 +29,16 @@ impl Engine {
             .resizable()
             .build()
             .unwrap();
-        let gl_context = window.gl_create_context().unwrap();
+        let _gl_context = window.gl_create_context().unwrap();
         let _gl = gl::load_with(|s| video.gl_get_proc_address(s) as *const c_void);
 
         let event_pump = sdl.event_pump()?;
         Ok(Self {
             event_pump,
             window,
-            gl_context,
+            _gl_context,
+            camera,
+            elements: Vec::new(),
         })
     }
     pub fn events(&mut self) -> Vec<sdl2::event::Event> {
@@ -51,5 +55,11 @@ impl Engine {
     }
     pub fn update_size(&self, w: i32, h: i32) {
         unsafe { gl::Viewport(0, 0, w, h) };
+    }
+    pub fn render(&self) {
+        self.elements.iter().for_each(|e| e.render(&self.camera));
+    }
+    pub fn add_element(&mut self, element: Element) {
+        self.elements.push(element);
     }
 }

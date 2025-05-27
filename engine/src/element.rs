@@ -53,7 +53,7 @@ impl Element {
         self.textures.push(texture);
         Ok(())
     }
-    pub fn render(&self, camera: &Camera) {
+    pub(crate) fn render(&self, camera: &Camera) {
         self.program.set_used();
         self.vao.bind();
 
