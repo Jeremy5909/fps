@@ -2,6 +2,7 @@ use std::os::raw::c_void;
 
 use sdl2::{
     EventPump,
+    keyboard::Scancode,
     video::{GLContext, Window},
 };
 
@@ -11,7 +12,7 @@ pub struct Engine {
     window: Window,
     _gl_context: GLContext,
     event_pump: EventPump,
-    camera: Camera,
+    pub camera: Camera,
     elements: Vec<Element>,
 }
 impl Engine {
@@ -61,5 +62,10 @@ impl Engine {
     }
     pub fn add_element(&mut self, element: Element) {
         self.elements.push(element);
+    }
+    pub fn key_pressed(&self, scan_code: Scancode) -> bool {
+        self.event_pump
+            .keyboard_state()
+            .is_scancode_pressed(scan_code)
     }
 }

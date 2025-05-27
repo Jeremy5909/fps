@@ -6,54 +6,35 @@ use engine::{
     element::Element,
     engine::Engine,
     event::{self, Event},
+    keyboard::{self, Keycode, Scancode},
+    mouse::MouseButton,
     program::Program,
 };
-use nalgebra::Point3;
 
 fn main() {
-    let camera = Camera::new(
-        1.0,
-        f32::consts::FRAC_PI_3,
-        0.1,
-        100.0,
-        Point3::new(0.0, 0.0, 3.0),
-    );
-    let mut engine = Engine::new("fps", camera).unwrap();
-
-    let mut vertices = Vec::new();
-    for z in [-0.5, 0.5] {
-        for y in [-0.5, 0.5] {
-            for x in [-0.5, 0.5] {
-                vertices.push(TextureVertex {
-                    pos: (x, y, z).into(),
-                    tex_coords: (x + 0.5, y + 0.5).into(),
-                });
-            }
-        }
-    }
+    let mut engine =
+        Engine::new("fps", Camera::new(1.0, f32::consts::FRAC_PI_3, 0.1, 100.0)).unwrap();
 
     let mut cube = Element::new(
-        vertices,
         vec![
-            // Back
-            0, 1, 2, // Bottom
-            1, 2, 3, // Top
-            // Left
-            0, 4, 2, // Bottom
-            4, 2, 6, // Top
-            // Right
-            1, 5, 3, // Bottom
-            5, 3, 7, // Top
-            // Front
-            4, 5, 7, // Bottom
-            4, 6, 7, // Top
-            // Top
-            6, 3, 7, // Bottom
-            6, 2, 3, // Top
-            // Bottom
-            4, 5, 1, // Bottom
-            4, 0, 1, // Top
+            TextureVertex {
+                pos: (-0.5, 0.5, 0.0).into(),
+                tex_coords: (0.0, 1.0).into(),
+            },
+            TextureVertex {
+                pos: (0.5, 0.5, 0.0).into(),
+                tex_coords: (1.0, 1.0).into(),
+            },
+            TextureVertex {
+                pos: (0.5, -0.5, 0.0).into(),
+                tex_coords: (1.0, 0.0).into(),
+            },
+            TextureVertex {
+                pos: (-0.5, -0.5, 0.0).into(),
+                tex_coords: (0.0, 0.0).into(),
+            },
         ],
+        vec![0, 1, 2, 0, 2, 3],
         Program::from_name("shaders/textured_cube").unwrap(),
     )
     .unwrap();
@@ -73,6 +54,20 @@ fn main() {
                 _ => {}
             }
         }
+
+        if engine.key_pressed(Scancode::W) {
+            engine.camera.move_forward();
+        }
+        if engine.key_pressed(Scancode::S) {
+            engine.camera.move_backward();
+        }
+        if engine.key_pressed(Scancode::A) {
+            engine.camera.move_left();
+        }
+        if engine.key_pressed(Scancode::D) {
+            engine.camera.move_right();
+        }
+
         engine.clear();
         engine.render();
         engine.swap_window();

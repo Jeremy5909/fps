@@ -11,6 +11,8 @@ mod shader;
 mod texture;
 mod vertex_arrray;
 pub use sdl2::event;
+pub use sdl2::keyboard;
+pub use sdl2::mouse;
 
 fn whitespace_cstring_with_len(len: usize) -> CString {
     let mut buffer: Vec<_> = Vec::with_capacity(len as usize + 1);
