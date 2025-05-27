@@ -5,6 +5,8 @@ use sdl2::{
     video::{GLContext, Window},
 };
 
+use crate::camera::Camera;
+
 pub struct Engine {
     window: Window,
     gl_context: GLContext,

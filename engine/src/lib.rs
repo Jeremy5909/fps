@@ -3,6 +3,7 @@ use std::ffi::CString;
 use vertex_attrib::VertexAttribPointers;
 
 mod buffer;
+pub mod camera;
 pub mod element;
 pub mod engine;
 pub mod program;

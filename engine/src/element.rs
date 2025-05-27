@@ -5,6 +5,7 @@ use vertex_attrib::VertexAttribPointers;
 
 use crate::{
     buffer::{ArrayBuffer, ElementBuffer},
+    camera::Camera,
     program::Program,
     texture::Texture,
     vertex_arrray::VertexArray,
@@ -52,14 +53,15 @@ impl Element {
         self.textures.push(texture);
         Ok(())
     }
-    pub fn render(&self, view: &Matrix4<f32>, projection: &Matrix4<f32>) {
+    pub fn render(&self, camera: &Camera) {
         self.program.set_used();
         self.vao.bind();
 
         self.textures.iter().for_each(|texture| texture.bind());
 
-        self.program.set_uniform_matrix4("projection", &projection);
-        self.program.set_uniform_matrix4("view", &view);
+        self.program
+            .set_uniform_matrix4("projection", &camera.projection);
+        self.program.set_uniform_matrix4("view", &camera.view);
         self.program
             .set_uniform_matrix4("model", &Matrix4::identity());
 
