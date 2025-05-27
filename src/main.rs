@@ -5,6 +5,7 @@ use engine::{
     event::{self, Event},
     program::Program,
 };
+use nalgebra::{Matrix4, Perspective3, Point3, Vector3};
 
 fn main() {
     let mut engine = Engine::new("fps").unwrap();
@@ -42,10 +43,24 @@ fn main() {
             4, 5, 1, // Bottom
             4, 0, 1, // Top
         ],
-        Program::from_name("shaders/textured_square").unwrap(),
+        Program::from_name("shaders/textured_cube").unwrap(),
     )
     .unwrap();
     cube.add_texture("brick_wall.jpg").unwrap();
+
+    // TODO: camera struct
+    let aspect_ratio = 1.0;
+    let fov = std::f32::consts::FRAC_PI_3; // 60 degrees
+    let near = 0.1;
+    let far = 100.0;
+
+    let projection: Matrix4<f32> = Perspective3::new(aspect_ratio, fov, near, far).to_homogeneous();
+
+    let eye = Point3::new(0.0, 0.0, 3.0); // Camera position
+    let target = Point3::origin(); // What it's looking at
+    let up = Vector3::y_axis(); // Up direction
+
+    let view: Matrix4<f32> = Matrix4::look_at_rh(&eye, &target, &up);
 
     engine.clear_color(0.7, 0.5, 1.0);
     'main: loop {
@@ -62,7 +77,7 @@ fn main() {
             }
         }
         engine.clear();
-        cube.render();
+        cube.render(&view, &projection);
         engine.swap_window();
     }
 }

@@ -1,5 +1,6 @@
 use std::ptr;
 
+use nalgebra::Matrix4;
 use vertex_attrib::VertexAttribPointers;
 
 use crate::{
@@ -12,6 +13,7 @@ pub struct Element {
     program: Program,
     vao: VertexArray,
     textures: Vec<Texture>,
+    index_count: i32,
 }
 
 impl Element {
@@ -41,6 +43,7 @@ impl Element {
             program: shader_program,
             vao,
             textures: Vec::new(),
+            index_count: indices.len() as i32,
         })
     }
     pub fn add_texture(&mut self, texture_path: &str) -> Result<(), String> {
@@ -49,15 +52,25 @@ impl Element {
         self.textures.push(texture);
         Ok(())
     }
-    pub fn render(&self) {
+    pub fn render(&self, view: &Matrix4<f32>, projection: &Matrix4<f32>) {
         self.program.set_used();
         self.vao.bind();
 
         self.textures.iter().for_each(|texture| texture.bind());
 
+        self.program.set_uniform_matrix4("projection", &projection);
+        self.program.set_uniform_matrix4("view", &view);
+        self.program
+            .set_uniform_matrix4("model", &Matrix4::identity());
+
         unsafe {
             gl::Clear(gl::COLOR_BUFFER_BIT);
-            gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, ptr::null());
+            gl::DrawElements(
+                gl::TRIANGLES,
+                self.index_count,
+                gl::UNSIGNED_INT,
+                ptr::null(),
+            );
         }
     }
 }

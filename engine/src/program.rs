@@ -1,5 +1,7 @@
 use std::{ffi::CString, fs};
 
+use nalgebra::Matrix4;
+
 use crate::{shader::Shader, whitespace_cstring_with_len};
 
 pub struct Program {
@@ -58,6 +60,13 @@ impl Program {
     }
     pub(crate) fn set_used(&self) {
         unsafe { gl::UseProgram(self.id) };
+    }
+    pub fn set_uniform_matrix4(&self, name: &str, matrix: &Matrix4<f32>) {
+        let location =
+            unsafe { gl::GetUniformLocation(self.id, CString::new(name).unwrap().as_ptr()) };
+        unsafe {
+            gl::UniformMatrix4fv(location, 1, gl::FALSE, matrix.as_ptr());
+        }
     }
 }
 impl Drop for Program {
