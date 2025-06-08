@@ -9,19 +9,35 @@ fn main() {
     let mut cube = Element::new(
         vec![
             TextureVertex {
-                pos: (-0.5, 0.5, 0.0).into(),
+                pos: (-0.5, 0.5, -1.0).into(),
                 tex_coords: (0.0, 1.0).into(),
             },
             TextureVertex {
-                pos: (0.5, 0.5, 0.0).into(),
+                pos: (0.5, 0.5, -1.0).into(),
                 tex_coords: (1.0, 1.0).into(),
             },
             TextureVertex {
-                pos: (0.5, -0.5, 0.0).into(),
+                pos: (0.5, -0.5, -1.0).into(),
                 tex_coords: (1.0, 0.0).into(),
             },
             TextureVertex {
-                pos: (-0.5, -0.5, 0.0).into(),
+                pos: (-0.5, -0.5, -1.0).into(),
+                tex_coords: (0.0, 0.0).into(),
+            },
+            TextureVertex {
+                pos: (-0.5, 0.5, 1.0).into(),
+                tex_coords: (0.0, 1.0).into(),
+            },
+            TextureVertex {
+                pos: (0.5, 0.5, 1.0).into(),
+                tex_coords: (1.0, 1.0).into(),
+            },
+            TextureVertex {
+                pos: (0.5, -0.5, 1.0).into(),
+                tex_coords: (1.0, 0.0).into(),
+            },
+            TextureVertex {
+                pos: (-0.5, -0.5, 1.0).into(),
                 tex_coords: (0.0, 0.0).into(),
             },
         ],

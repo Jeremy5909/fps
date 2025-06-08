@@ -39,6 +39,7 @@ impl Engine {
         let _gl = gl::load_with(|s| video.gl_get_proc_address(s) as *const c_void);
 
         let event_pump = sdl.event_pump()?;
+        unsafe { gl::Enable(gl::DEPTH_TEST) };
         Ok(Self {
             event_pump,
             window,
@@ -60,7 +61,7 @@ impl Engine {
         unsafe { gl::ClearColor(r, g, b, 0.0) };
     }
     fn clear(&self) {
-        unsafe { gl::Clear(gl::COLOR_BUFFER_BIT) };
+        unsafe { gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT) };
     }
     pub fn update_size(&self, w: i32, h: i32) {
         unsafe { gl::Viewport(0, 0, w, h) };
