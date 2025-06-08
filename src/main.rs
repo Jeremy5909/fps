@@ -3,7 +3,8 @@ use engine::{TextureVertex, element::Element, engine::Engine, hooks, program::Pr
 fn main() {
     let mut engine = Engine::new("fps", Default::default())
         .unwrap()
-        .add_hook(hooks::wasd_movement);
+        .add_hook(hooks::wasd_flying_movement)
+        .add_event_hook(hooks::event_hooks::mouse_movement);
 
     let mut cube = Element::new(
         vec![
