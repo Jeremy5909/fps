@@ -1,3 +1,5 @@
+use std::f32;
+
 use nalgebra::{Matrix4, Perspective3, Point3, Vector3};
 
 pub struct Camera {
@@ -54,5 +56,10 @@ impl Camera {
     pub fn move_left(&mut self) {
         self.position -= self.orientation.cross(&Vector3::y()).normalize() * self.movement_speed;
         self.update_view();
+    }
+}
+impl Default for Camera {
+    fn default() -> Self {
+        Self::new(1.0, f32::consts::PI / 3.0, 0.1, 100.0)
     }
 }

@@ -1,19 +1,14 @@
-use std::f32;
-
 use engine::{
     TextureVertex,
-    camera::Camera,
     element::Element,
     engine::Engine,
     event::{self, Event},
-    keyboard::{self, Keycode, Scancode},
-    mouse::MouseButton,
+    keyboard::Scancode,
     program::Program,
 };
 
 fn main() {
-    let mut engine =
-        Engine::new("fps", Camera::new(1.0, f32::consts::FRAC_PI_3, 0.1, 100.0)).unwrap();
+    let mut engine = Engine::new("fps", Default::default()).unwrap();
 
     let mut cube = Element::new(
         vec![
