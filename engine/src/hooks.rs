@@ -16,3 +16,17 @@ pub fn wasd_movement(engine: &mut Engine) {
         engine.camera.move_right();
     }
 }
+
+pub mod event_hooks {
+    use sdl2::event::Event;
+
+    use crate::engine::Engine;
+
+    pub fn mouse_movement(engine: &mut Engine, event: &Event) {
+        engine.set_relative_mouse();
+        match *event {
+            Event::MouseMotion { xrel, yrel, .. } => engine.camera.rotate(xrel, yrel),
+            _ => {}
+        }
+    }
+}

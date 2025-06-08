@@ -4,6 +4,7 @@ use sdl2::{
     EventPump,
     event::{self, Event},
     keyboard::Scancode,
+    mouse::MouseUtil,
     video::{GLContext, Window},
 };
 
@@ -16,6 +17,8 @@ pub struct Engine {
     pub camera: Camera,
     elements: Vec<Element>,
     hooks: Vec<Box<dyn FnMut(&mut Engine)>>,
+    event_hooks: Vec<Box<dyn FnMut(&mut Engine, &Event)>>,
+    mouse: MouseUtil,
 }
 impl Engine {
     pub fn new(title: &str, camera: Camera) -> Result<Self, String> {
@@ -43,11 +46,9 @@ impl Engine {
             camera,
             elements: Vec::new(),
             hooks: Vec::new(),
+            event_hooks: Vec::new(),
+            mouse: sdl.mouse(),
         })
-    }
-    pub fn add_hook(mut self, hook: impl FnMut(&mut Engine) + 'static) -> Self {
-        self.hooks.push(Box::new(hook));
-        self
     }
     pub fn events(&mut self) -> Vec<sdl2::event::Event> {
         self.event_pump.poll_iter().collect()
@@ -75,8 +76,22 @@ impl Engine {
             .keyboard_state()
             .is_scancode_pressed(scan_code)
     }
+    pub fn add_hook(mut self, hook: impl FnMut(&mut Engine) + 'static) -> Self {
+        self.hooks.push(Box::new(hook));
+        self
+    }
+    pub fn add_event_hook(mut self, hook: impl FnMut(&mut Engine, &Event) + 'static) -> Self {
+        self.event_hooks.push(Box::new(hook));
+        self
+    }
+    pub fn set_relative_mouse(&mut self) {
+        self.mouse.set_relative_mouse_mode(true);
+    }
     pub fn run(&mut self) {
         'main: loop {
+            let mut hooks = mem::take(&mut self.hooks);
+            let mut event_hooks = mem::take(&mut self.event_hooks);
+
             for event in self.events() {
                 match event {
                     Event::Quit { .. } => break 'main,
@@ -88,13 +103,15 @@ impl Engine {
                     }
                     _ => {}
                 }
+                for hook in &mut event_hooks {
+                    hook(self, &event);
+                }
             }
-
-            let mut hooks = mem::take(&mut self.hooks);
             for hook in &mut hooks {
                 hook(self);
             }
             self.hooks = hooks;
+            self.event_hooks = event_hooks;
 
             self.clear();
             self.render();

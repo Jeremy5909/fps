@@ -1,6 +1,6 @@
 use std::f32;
 
-use nalgebra::{Matrix4, Perspective3, Point3, Vector3};
+use nalgebra::{Matrix4, Perspective3, Point3, Unit, Vector3};
 
 pub struct Camera {
     pub(crate) projection: Matrix4<f32>,
@@ -55,6 +55,22 @@ impl Camera {
     }
     pub fn move_left(&mut self) {
         self.position -= self.orientation.cross(&Vector3::y()).normalize() * self.movement_speed;
+        self.update_view();
+    }
+    pub fn rotate(&mut self, xrel: i32, yrel: i32) {
+        let sensitivity = 0.002;
+        let yaw = -xrel as f32 * sensitivity;
+        let pitch = -yrel as f32 * sensitivity;
+
+        // Horizontal rotation (around global Y)
+        let rotation_y = Matrix4::from_euler_angles(0.0, yaw, 0.0);
+        self.orientation = (rotation_y.transform_vector(&self.orientation)).normalize();
+
+        // Vertical rotation (around right vector)
+        let right = Unit::new_normalize(self.orientation.cross(&Vector3::y()));
+        let rotation_x = Matrix4::from_axis_angle(&right, pitch);
+        self.orientation = (rotation_x.transform_vector(&self.orientation)).normalize();
+
         self.update_view();
     }
 }
