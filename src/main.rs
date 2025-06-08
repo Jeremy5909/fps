@@ -1,14 +1,9 @@
-use engine::{
-    TextureVertex,
-    element::Element,
-    engine::Engine,
-    event::{self, Event},
-    keyboard::Scancode,
-    program::Program,
-};
+use engine::{TextureVertex, element::Element, engine::Engine, hooks, program::Program};
 
 fn main() {
-    let mut engine = Engine::new("fps", Default::default()).unwrap();
+    let mut engine = Engine::new("fps", Default::default())
+        .unwrap()
+        .add_hook(hooks::wasd_movement);
 
     let mut cube = Element::new(
         vec![
@@ -36,35 +31,6 @@ fn main() {
     cube.add_texture("brick_wall.jpg").unwrap();
     engine.add_element(cube);
     engine.clear_color(0.7, 0.5, 1.0);
-    'main: loop {
-        for event in engine.events() {
-            match event {
-                Event::Quit { .. } => break 'main,
-                Event::Window {
-                    win_event: event::WindowEvent::Resized(w, h),
-                    ..
-                } => {
-                    engine.update_size(w, h);
-                }
-                _ => {}
-            }
-        }
 
-        if engine.key_pressed(Scancode::W) {
-            engine.camera.move_forward();
-        }
-        if engine.key_pressed(Scancode::S) {
-            engine.camera.move_backward();
-        }
-        if engine.key_pressed(Scancode::A) {
-            engine.camera.move_left();
-        }
-        if engine.key_pressed(Scancode::D) {
-            engine.camera.move_right();
-        }
-
-        engine.clear();
-        engine.render();
-        engine.swap_window();
-    }
+    engine.run();
 }

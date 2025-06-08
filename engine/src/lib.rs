@@ -6,6 +6,7 @@ mod buffer;
 pub mod camera;
 pub mod element;
 pub mod engine;
+pub mod hooks;
 pub mod program;
 mod shader;
 mod texture;
