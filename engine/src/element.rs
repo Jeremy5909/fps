@@ -76,3 +76,56 @@ impl Element {
         }
     }
 }
+
+pub mod primitives {
+    pub mod textured_cube {
+        use crate::TextureVertex;
+
+        pub fn verts() -> Vec<TextureVertex> {
+            vec![
+                TextureVertex {
+                    pos: (-0.5, 0.5, -0.5).into(),
+                    tex_coords: (0.0, 1.0).into(),
+                },
+                TextureVertex {
+                    pos: (0.5, 0.5, -0.5).into(),
+                    tex_coords: (1.0, 1.0).into(),
+                },
+                TextureVertex {
+                    pos: (0.5, -0.5, -0.5).into(),
+                    tex_coords: (1.0, 0.0).into(),
+                },
+                TextureVertex {
+                    pos: (-0.5, -0.5, -0.5).into(),
+                    tex_coords: (0.0, 0.0).into(),
+                },
+                TextureVertex {
+                    pos: (-0.5, 0.5, 0.5).into(),
+                    tex_coords: (0.0, 1.0).into(),
+                },
+                TextureVertex {
+                    pos: (0.5, 0.5, 0.5).into(),
+                    tex_coords: (1.0, 1.0).into(),
+                },
+                TextureVertex {
+                    pos: (0.5, -0.5, 0.5).into(),
+                    tex_coords: (1.0, 0.0).into(),
+                },
+                TextureVertex {
+                    pos: (-0.5, -0.5, 0.5).into(),
+                    tex_coords: (0.0, 0.0).into(),
+                },
+            ]
+        }
+        pub fn indices() -> Vec<i32> {
+            vec![
+                0, 1, 2, 0, 2, 3, // Back
+                4, 5, 6, 4, 6, 7, // Front
+                0, 3, 4, 3, 4, 7, // Left
+                1, 2, 5, 2, 5, 6, // Right
+                0, 1, 4, 1, 4, 5, // Top
+                2, 3, 7, 2, 6, 7, // Bottom
+            ]
+        }
+    }
+}

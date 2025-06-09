@@ -75,5 +75,3 @@ pub struct TextureVertex {
     #[location = 1]
     pub tex_coords: Vec2,
 }
-
-impl Vertex {}
