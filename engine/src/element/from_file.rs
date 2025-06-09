@@ -1,7 +1,7 @@
 use crate::{TextureVertex, element::Element};
 
 impl Element {
-    pub fn from_obj(file_name: &str) -> Result<Vec<Element>, String> {
+    pub fn from_obj(file_name: &str, textures_path: &str) -> Result<Vec<Element>, String> {
         let load_options = tobj::LoadOptions {
             triangulate: true,
             single_index: true,
@@ -44,7 +44,7 @@ impl Element {
                     .ok_or(String::from("Material not found"))?;
                 if let Some(diffuse_texture_name) = &material.diffuse_texture {
                     eprintln!("Loading texture '{}'", diffuse_texture_name);
-                    element.add_texture(&format!("textures/{diffuse_texture_name}"))?;
+                    element.add_texture(&format!("{textures_path}/{diffuse_texture_name}"))?;
                 }
             }
             elements.push(element);
