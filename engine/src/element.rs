@@ -129,7 +129,6 @@ impl Element {
         self.program.set_uniform_matrix4("model", &self.model);
 
         unsafe {
-            gl::Clear(gl::COLOR_BUFFER_BIT);
             gl::DrawElements(
                 gl::TRIANGLES,
                 self.index_count,
