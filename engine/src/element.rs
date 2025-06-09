@@ -16,6 +16,7 @@ pub struct Element {
     vao: VertexArray,
     textures: Vec<Texture>,
     index_count: i32,
+    pub model: Matrix4<f32>,
 }
 
 impl Element {
@@ -46,6 +47,7 @@ impl Element {
             vao,
             textures: Vec::new(),
             index_count: indices.len() as i32,
+            model: Matrix4::identity(),
         })
     }
     pub fn from_obj(file_name: &str) -> Result<Vec<Element>, String> {
@@ -124,8 +126,7 @@ impl Element {
         self.program
             .set_uniform_matrix4("projection", &camera.projection);
         self.program.set_uniform_matrix4("view", &camera.view);
-        self.program
-            .set_uniform_matrix4("model", &Matrix4::identity());
+        self.program.set_uniform_matrix4("model", &self.model);
 
         unsafe {
             gl::Clear(gl::COLOR_BUFFER_BIT);
