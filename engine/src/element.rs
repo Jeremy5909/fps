@@ -4,7 +4,7 @@ use nalgebra::Matrix4;
 use vertex_attrib::VertexAttribPointers;
 
 use crate::{
-    Vertex,
+    TextureVertex,
     buffer::{ArrayBuffer, ElementBuffer},
     camera::Camera,
     program::Program,
@@ -51,34 +51,67 @@ impl Element {
     pub fn from_obj(file_name: &str) -> Result<Vec<Element>, String> {
         let load_options = tobj::LoadOptions {
             triangulate: true,
+            single_index: true,
             ..Default::default()
         };
         let (models, materials) = tobj::load_obj(file_name, &load_options)
             .map_err(|_| String::from("Error loading object"))?;
-        let materials = materials.map_err(|_| String::from("Error loading material"));
+        let materials = materials.map_err(|_| String::from("Error loading material"))?;
 
         let mut elements = Vec::new();
         for model in models {
             eprintln!("model '{}' loaded", model.name);
             let mesh = model.mesh;
 
-            let verts: Vec<Vertex> = mesh
+            let verts: Vec<_> = mesh
                 .positions
                 .chunks_exact(3)
-                .map(|i| Vertex {
-                    pos: (i[0], i[1], i[2]).into(),
-                })
+                .map(|i| (i[0], i[1], i[2]).into())
+                .collect();
+            let tex_coords: Vec<_> = mesh
+                .texcoords
+                .chunks_exact(2)
+                .map(|i| (i[0], i[1]).into())
                 .collect();
             let indices = mesh.indices.iter().map(|i| *i as i32).collect();
 
-            let element = Element::new(verts, indices, Program::from_name("shaders/diffuse")?)?;
+            let verts: Vec<_> = verts.iter().zip(&tex_coords).collect();
+            let verts: Vec<_> = verts
+                .iter()
+                .map(|(vert, tex_coord)| TextureVertex {
+                    pos: **vert,
+                    tex_coords: **tex_coord,
+                })
+                .collect();
+
+            let mut element =
+                Element::new(verts, indices, Program::from_name("shaders/textured")?)?;
+            if let Some(id) = mesh.material_id {
+                let material = materials
+                    .get(id)
+                    .ok_or(String::from("Material not found"))?;
+                if let Some(diffuse_texture_name) = &material.diffuse_texture {
+                    eprintln!("Loading texture '{}'", diffuse_texture_name);
+                    element.add_texture(&format!("textures/{diffuse_texture_name}"))?;
+                }
+            }
             elements.push(element);
         }
+
         Ok(elements)
     }
     pub fn add_texture(&mut self, texture_path: &str) -> Result<(), String> {
         let texture = Texture::new();
-        texture.load(texture_path).map_err(|e| e.to_string())?;
+        let file_type = texture_path
+            .split(|x| x == '.')
+            .skip(1)
+            .next()
+            .ok_or("Must have file type")?;
+        match file_type {
+            "jpg" => texture.load_jpg(texture_path).map_err(|e| e.to_string())?,
+            "png" => texture.load_png(texture_path).map_err(|e| e.to_string())?,
+            _ => return Err(String::from("Unkown file type")),
+        }
         self.textures.push(texture);
         Ok(())
     }
@@ -102,130 +135,6 @@ impl Element {
                 gl::UNSIGNED_INT,
                 ptr::null(),
             );
-        }
-    }
-}
-
-pub mod primitives {
-    pub mod textured_cube {
-        use crate::TextureVertex;
-
-        pub fn verts() -> Vec<TextureVertex> {
-            vec![
-                // Back face
-                TextureVertex {
-                    pos: (-0.5, 0.5, -0.5).into(),
-                    tex_coords: (0.0, 1.0).into(),
-                },
-                TextureVertex {
-                    pos: (0.5, 0.5, -0.5).into(),
-                    tex_coords: (1.0, 1.0).into(),
-                },
-                TextureVertex {
-                    pos: (0.5, -0.5, -0.5).into(),
-                    tex_coords: (1.0, 0.0).into(),
-                },
-                TextureVertex {
-                    pos: (-0.5, -0.5, -0.5).into(),
-                    tex_coords: (0.0, 0.0).into(),
-                },
-                // Front face
-                TextureVertex {
-                    pos: (-0.5, 0.5, 0.5).into(),
-                    tex_coords: (0.0, 1.0).into(),
-                },
-                TextureVertex {
-                    pos: (0.5, 0.5, 0.5).into(),
-                    tex_coords: (1.0, 1.0).into(),
-                },
-                TextureVertex {
-                    pos: (0.5, -0.5, 0.5).into(),
-                    tex_coords: (1.0, 0.0).into(),
-                },
-                TextureVertex {
-                    pos: (-0.5, -0.5, 0.5).into(),
-                    tex_coords: (0.0, 0.0).into(),
-                },
-                // Left face
-                TextureVertex {
-                    pos: (-0.5, 0.5, -0.5).into(),
-                    tex_coords: (1.0, 1.0).into(),
-                },
-                TextureVertex {
-                    pos: (-0.5, 0.5, 0.5).into(),
-                    tex_coords: (0.0, 1.0).into(),
-                },
-                TextureVertex {
-                    pos: (-0.5, -0.5, 0.5).into(),
-                    tex_coords: (0.0, 0.0).into(),
-                },
-                TextureVertex {
-                    pos: (-0.5, -0.5, -0.5).into(),
-                    tex_coords: (1.0, 0.0).into(),
-                },
-                // Right face
-                TextureVertex {
-                    pos: (0.5, 0.5, -0.5).into(),
-                    tex_coords: (0.0, 1.0).into(),
-                },
-                TextureVertex {
-                    pos: (0.5, 0.5, 0.5).into(),
-                    tex_coords: (1.0, 1.0).into(),
-                },
-                TextureVertex {
-                    pos: (0.5, -0.5, 0.5).into(),
-                    tex_coords: (1.0, 0.0).into(),
-                },
-                TextureVertex {
-                    pos: (0.5, -0.5, -0.5).into(),
-                    tex_coords: (0.0, 0.0).into(),
-                },
-                // Top face
-                TextureVertex {
-                    pos: (-0.5, 0.5, -0.5).into(),
-                    tex_coords: (0.0, 1.0).into(),
-                },
-                TextureVertex {
-                    pos: (-0.5, 0.5, 0.5).into(),
-                    tex_coords: (0.0, 0.0).into(),
-                },
-                TextureVertex {
-                    pos: (0.5, 0.5, 0.5).into(),
-                    tex_coords: (1.0, 0.0).into(),
-                },
-                TextureVertex {
-                    pos: (0.5, 0.5, -0.5).into(),
-                    tex_coords: (1.0, 1.0).into(),
-                },
-                // Bottom face
-                TextureVertex {
-                    pos: (-0.5, -0.5, -0.5).into(),
-                    tex_coords: (0.0, 1.0).into(),
-                },
-                TextureVertex {
-                    pos: (-0.5, -0.5, 0.5).into(),
-                    tex_coords: (0.0, 0.0).into(),
-                },
-                TextureVertex {
-                    pos: (0.5, -0.5, 0.5).into(),
-                    tex_coords: (1.0, 0.0).into(),
-                },
-                TextureVertex {
-                    pos: (0.5, -0.5, -0.5).into(),
-                    tex_coords: (1.0, 1.0).into(),
-                },
-            ]
-        }
-
-        pub fn indices() -> Vec<i32> {
-            vec![
-                0, 1, 2, 0, 2, 3, // Back
-                4, 5, 6, 4, 6, 7, // Front
-                8, 9, 10, 8, 10, 11, // Left
-                12, 13, 14, 12, 14, 15, // Right
-                16, 17, 18, 16, 18, 19, // Top
-                20, 21, 22, 20, 22, 23, // Bottom
-            ]
         }
     }
 }

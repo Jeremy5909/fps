@@ -40,6 +40,7 @@ trait VertexAttrib {
     }
 }
 #[repr(transparent)]
+#[derive(Debug, Copy, Clone)]
 pub struct Vec2(pub (f32, f32));
 impl VertexAttrib for Vec2 {
     const COMPONENTS: i32 = 2;
@@ -50,6 +51,7 @@ impl From<(f32, f32)> for Vec2 {
     }
 }
 #[repr(transparent)]
+#[derive(Debug, Copy, Clone)]
 pub struct Vec3(pub (f32, f32, f32));
 impl VertexAttrib for Vec3 {
     const COMPONENTS: i32 = 3;
