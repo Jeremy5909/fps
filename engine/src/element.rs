@@ -83,6 +83,7 @@ pub mod primitives {
 
         pub fn verts() -> Vec<TextureVertex> {
             vec![
+                // Back face
                 TextureVertex {
                     pos: (-0.5, 0.5, -0.5).into(),
                     tex_coords: (0.0, 1.0).into(),
@@ -99,6 +100,7 @@ pub mod primitives {
                     pos: (-0.5, -0.5, -0.5).into(),
                     tex_coords: (0.0, 0.0).into(),
                 },
+                // Front face
                 TextureVertex {
                     pos: (-0.5, 0.5, 0.5).into(),
                     tex_coords: (0.0, 1.0).into(),
@@ -115,16 +117,85 @@ pub mod primitives {
                     pos: (-0.5, -0.5, 0.5).into(),
                     tex_coords: (0.0, 0.0).into(),
                 },
+                // Left face
+                TextureVertex {
+                    pos: (-0.5, 0.5, -0.5).into(),
+                    tex_coords: (1.0, 1.0).into(),
+                },
+                TextureVertex {
+                    pos: (-0.5, 0.5, 0.5).into(),
+                    tex_coords: (0.0, 1.0).into(),
+                },
+                TextureVertex {
+                    pos: (-0.5, -0.5, 0.5).into(),
+                    tex_coords: (0.0, 0.0).into(),
+                },
+                TextureVertex {
+                    pos: (-0.5, -0.5, -0.5).into(),
+                    tex_coords: (1.0, 0.0).into(),
+                },
+                // Right face
+                TextureVertex {
+                    pos: (0.5, 0.5, -0.5).into(),
+                    tex_coords: (0.0, 1.0).into(),
+                },
+                TextureVertex {
+                    pos: (0.5, 0.5, 0.5).into(),
+                    tex_coords: (1.0, 1.0).into(),
+                },
+                TextureVertex {
+                    pos: (0.5, -0.5, 0.5).into(),
+                    tex_coords: (1.0, 0.0).into(),
+                },
+                TextureVertex {
+                    pos: (0.5, -0.5, -0.5).into(),
+                    tex_coords: (0.0, 0.0).into(),
+                },
+                // Top face
+                TextureVertex {
+                    pos: (-0.5, 0.5, -0.5).into(),
+                    tex_coords: (0.0, 1.0).into(),
+                },
+                TextureVertex {
+                    pos: (-0.5, 0.5, 0.5).into(),
+                    tex_coords: (0.0, 0.0).into(),
+                },
+                TextureVertex {
+                    pos: (0.5, 0.5, 0.5).into(),
+                    tex_coords: (1.0, 0.0).into(),
+                },
+                TextureVertex {
+                    pos: (0.5, 0.5, -0.5).into(),
+                    tex_coords: (1.0, 1.0).into(),
+                },
+                // Bottom face
+                TextureVertex {
+                    pos: (-0.5, -0.5, -0.5).into(),
+                    tex_coords: (0.0, 1.0).into(),
+                },
+                TextureVertex {
+                    pos: (-0.5, -0.5, 0.5).into(),
+                    tex_coords: (0.0, 0.0).into(),
+                },
+                TextureVertex {
+                    pos: (0.5, -0.5, 0.5).into(),
+                    tex_coords: (1.0, 0.0).into(),
+                },
+                TextureVertex {
+                    pos: (0.5, -0.5, -0.5).into(),
+                    tex_coords: (1.0, 1.0).into(),
+                },
             ]
         }
+
         pub fn indices() -> Vec<i32> {
             vec![
                 0, 1, 2, 0, 2, 3, // Back
                 4, 5, 6, 4, 6, 7, // Front
-                0, 3, 4, 3, 4, 7, // Left
-                1, 2, 5, 2, 5, 6, // Right
-                0, 1, 4, 1, 4, 5, // Top
-                2, 3, 7, 2, 6, 7, // Bottom
+                8, 9, 10, 8, 10, 11, // Left
+                12, 13, 14, 12, 14, 15, // Right
+                16, 17, 18, 16, 18, 19, // Top
+                20, 21, 22, 20, 22, 23, // Bottom
             ]
         }
     }
