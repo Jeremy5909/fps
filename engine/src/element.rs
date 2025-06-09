@@ -4,6 +4,7 @@ use nalgebra::Matrix4;
 use vertex_attrib::VertexAttribPointers;
 
 use crate::{
+    Vertex,
     buffer::{ArrayBuffer, ElementBuffer},
     camera::Camera,
     program::Program,
@@ -46,6 +47,34 @@ impl Element {
             textures: Vec::new(),
             index_count: indices.len() as i32,
         })
+    }
+    pub fn from_obj(file_name: &str) -> Result<Vec<Element>, String> {
+        let load_options = tobj::LoadOptions {
+            triangulate: true,
+            ..Default::default()
+        };
+        let (models, materials) = tobj::load_obj(file_name, &load_options)
+            .map_err(|_| String::from("Error loading object"))?;
+        let materials = materials.map_err(|_| String::from("Error loading material"));
+
+        let mut elements = Vec::new();
+        for model in models {
+            eprintln!("model '{}' loaded", model.name);
+            let mesh = model.mesh;
+
+            let verts: Vec<Vertex> = mesh
+                .positions
+                .chunks_exact(3)
+                .map(|i| Vertex {
+                    pos: (i[0], i[1], i[2]).into(),
+                })
+                .collect();
+            let indices = mesh.indices.iter().map(|i| *i as i32).collect();
+
+            let element = Element::new(verts, indices, Program::from_name("shaders/diffuse")?)?;
+            elements.push(element);
+        }
+        Ok(elements)
     }
     pub fn add_texture(&mut self, texture_path: &str) -> Result<(), String> {
         let texture = Texture::new();

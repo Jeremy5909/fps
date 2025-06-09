@@ -8,4 +8,5 @@ gl = "0.14.0"
 image = "0.25.6"
 nalgebra = "0.33.2"
 sdl2 = "0.37.0"
+tobj = "4.0.3"
 vertex_attrib = {path = "vertex_attrib"}
