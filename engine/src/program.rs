@@ -47,8 +47,10 @@ impl Program {
     pub fn from_name(name: &str) -> Result<Program, String> {
         let vert_source = fs::read_to_string(format!("{}.vert", name))
             .map_err(|_| format!("File {}.vert not found", name))?;
+        eprintln!("Loaded shader {name}.vert");
         let frag_source = fs::read_to_string(format!("{}.frag", name))
             .map_err(|_| format!("File {}.frag not found", name))?;
+        eprintln!("Loaded shader {name}.frag");
 
         let vert_cstring = CString::new(vert_source).map_err(|e| format!("{e}"))?;
         let frag_cstring = CString::new(frag_source).map_err(|e| format!("{e}"))?;

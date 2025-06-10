@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::{program::Program, texture::Texture};
 
 use super::Element;
@@ -18,8 +20,8 @@ impl Element {
         self.textures.push(texture);
         Ok(())
     }
-    pub fn add_program(&mut self, name: &str) -> Result<(), String> {
-        self.program = Some(Program::from_name(name)?);
+    pub fn add_program(&mut self, program: Rc<Program>) -> Result<(), String> {
+        self.program = Some(program);
         Ok(())
     }
 }

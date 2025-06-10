@@ -1,4 +1,4 @@
-use std::ptr;
+use std::{ptr, rc::Rc};
 
 use nalgebra::Matrix4;
 use vertex_attrib::VertexAttribPointers;
@@ -14,7 +14,7 @@ use crate::{
     vertex_arrray::VertexArray,
 };
 pub struct Element {
-    program: Option<Program>,
+    program: Option<Rc<Program>>,
     vao: VertexArray,
     textures: Vec<Texture>,
     index_count: i32,
