@@ -29,6 +29,14 @@ impl Camera {
         self.position -= self.orientation.cross(&Vector3::y()).normalize() * self.movement_speed;
         self.update_view();
     }
+    pub fn move_up(&mut self) {
+        self.position += Vector3::y() * self.movement_speed;
+        self.update_view();
+    }
+    pub fn move_down(&mut self) {
+        self.position -= Vector3::y() * self.movement_speed;
+        self.update_view();
+    }
     pub fn rotate(&mut self, xrel: i32, yrel: i32) {
         let sensitivity = 0.002;
         let yaw = -xrel as f32 * sensitivity;

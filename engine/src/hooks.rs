@@ -15,6 +15,12 @@ pub fn wasd_flying_movement(engine: &mut Engine) {
     if engine.key_pressed(Scancode::D) {
         engine.camera.move_right();
     }
+    if engine.key_pressed(Scancode::Space) {
+        engine.camera.move_up();
+    }
+    if engine.key_pressed(Scancode::LShift) {
+        engine.camera.move_down();
+    }
 }
 
 pub mod event_hooks {
