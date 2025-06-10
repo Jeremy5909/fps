@@ -1,4 +1,4 @@
-use crate::{TextureVertex, element::Element};
+use crate::{DiffuseVertex, element::Element};
 
 impl Element {
     pub fn from_obj(file_name: &str, textures_path: &str) -> Result<Vec<Element>, String> {
@@ -26,14 +26,28 @@ impl Element {
                 .chunks_exact(2)
                 .map(|i| (i[0], i[1]).into())
                 .collect();
+            let normals: Vec<_> = mesh
+                .normals
+                .chunks_exact(3)
+                .map(|i| (i[0], i[1], i[2]).into())
+                .collect();
             let indices = mesh.indices.iter().map(|i| *i as i32).collect();
 
-            let verts: Vec<_> = verts.iter().zip(&tex_coords).collect();
             let verts: Vec<_> = verts
                 .iter()
-                .map(|(vert, tex_coord)| TextureVertex {
+                .zip(&tex_coords)
+                .zip(&normals)
+                .map(|((a, b), c)| (a, b, c))
+                .collect();
+            let verts: Vec<_> = verts
+                .iter()
+                .map(|(vert, tex_coord, normals)| DiffuseVertex {
+                    // Vertex should be generic or something
+                    // so it can have any vertex
                     pos: **vert,
-                    tex_coords: **tex_coord,
+                    tex_coord: **tex_coord,
+                    normal: **normals,
+                    color: (1.0, 1.0, 1.0).into(),
                 })
                 .collect();
 

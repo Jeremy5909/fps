@@ -78,3 +78,16 @@ pub struct TextureVertex {
     #[location = 1]
     pub tex_coords: Vec2,
 }
+
+#[repr(C)]
+#[derive(VertexAttribPointers)]
+pub struct DiffuseVertex {
+    #[location = 0]
+    pub pos: Vec3,
+    #[location = 1]
+    pub normal: Vec3,
+    #[location = 2]
+    pub color: Vec3,
+    #[location = 3]
+    pub tex_coord: Vec2,
+}
