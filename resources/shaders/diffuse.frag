@@ -7,16 +7,28 @@ in vec2 vertexTexCoord;
 
 out vec4 FragColor;
 
+struct Light {
+    vec3 position;
+    vec4 color;
+};
+
+uniform int lightCount;
+uniform Light lights[8];
 uniform sampler2D diffuse0;
-uniform vec4 lightColor;
-uniform vec3 lightPos;
 
 void main() {
-    float ambient = 0.20f;
+    vec3 result = vec3(0.0);
+    vec3 norm = normalize(normal);
 
-    vec3 normal = normalize(normal);
-    vec3 lightDirection = normalize(lightPos - position);
-    float diffuse = max(dot(normal, lightDirection), 0.0f);
+    for (int i = 0; i < lightCount; i++) {
+        vec3 lightDir = normalize(lights[i].position - position);
 
-    FragColor = texture(diffuse0, vertexTexCoord) * lightColor * (diffuse + ambient);
+        // diffuse
+        float diff = max(dot(norm, lightDir), 0.0);
+
+        vec3 lightColor = lights[i].color.rgb;
+        result += (0.2 + diff) * lightColor;
+    }
+
+    FragColor = texture(diffuse0, vertexTexCoord) * vec4(result, 1.0);
 }
