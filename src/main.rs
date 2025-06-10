@@ -1,6 +1,8 @@
 use std::rc::Rc;
 
-use engine::{Scale3, Translation3, element::Element, engine::Engine, hooks, program::Program};
+use engine::{
+    Scale3, Translation3, Vector4, element::Element, engine::Engine, hooks, program::Program,
+};
 
 fn main() {
     let mut engine = Engine::new("fps", Default::default())
@@ -9,7 +11,8 @@ fn main() {
         .add_event_hook(hooks::event_hooks::mouse_movement);
 
     let emissive = Program::from_name("resources/shaders/emissive").unwrap();
-    let diffuse = Program::from_name("resources/shaders/textured").unwrap();
+    emissive.set_uniform_vector4("color", &Vector4::new(1.0, 1.0, 1.0, 1.0));
+    let diffuse = Program::from_name("resources/shaders/diffuse").unwrap();
 
     let mut light = Element::from_obj("resources/models/cube.obj", "resources/textures")
         .unwrap()

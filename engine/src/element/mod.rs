@@ -52,9 +52,6 @@ impl Element {
         })
     }
     pub(crate) fn render(&self, camera: &Camera) {
-        if let Some(program) = &self.program {
-            program.set_used();
-        }
         self.vao.bind();
 
         self.textures.iter().for_each(|texture| texture.bind());

@@ -1,6 +1,6 @@
 use std::{ffi::CString, fs};
 
-use nalgebra::Matrix4;
+use nalgebra::{Matrix4, Vector4};
 
 use crate::{shader::Shader, whitespace_cstring_with_len};
 
@@ -64,10 +64,19 @@ impl Program {
         unsafe { gl::UseProgram(self.id) };
     }
     pub fn set_uniform_matrix4(&self, name: &str, matrix: &Matrix4<f32>) {
+        self.set_used();
         let location =
             unsafe { gl::GetUniformLocation(self.id, CString::new(name).unwrap().as_ptr()) };
         unsafe {
             gl::UniformMatrix4fv(location, 1, gl::FALSE, matrix.as_ptr());
+        }
+    }
+    pub fn set_uniform_vector4(&self, name: &str, matrix: &Vector4<f32>) {
+        self.set_used();
+        let location =
+            unsafe { gl::GetUniformLocation(self.id, CString::new(name).unwrap().as_ptr()) };
+        unsafe {
+            gl::Uniform4f(location, matrix.x, matrix.y, matrix.z, matrix.w);
         }
     }
 }
