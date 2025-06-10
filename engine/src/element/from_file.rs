@@ -1,7 +1,7 @@
 use crate::{DiffuseVertex, element::Element};
 
-impl Element {
-    pub fn from_obj(file_name: &str, textures_path: &str) -> Result<Vec<Element>, String> {
+impl<'a> Element<'a> {
+    pub fn from_obj(file_name: &str, textures_path: &str) -> Result<Vec<Element<'a>>, String> {
         let load_options = tobj::LoadOptions {
             triangulate: true,
             single_index: true,

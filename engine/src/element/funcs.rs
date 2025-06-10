@@ -2,7 +2,7 @@ use crate::{program::Program, texture::Texture};
 
 use super::Element;
 
-impl Element {
+impl<'a> Element<'a> {
     pub fn add_texture(&mut self, texture_path: &str) -> Result<(), String> {
         let texture = Texture::new();
         let file_type = texture_path
@@ -15,11 +15,11 @@ impl Element {
             "png" => texture.load_png(texture_path).map_err(|e| e.to_string())?,
             _ => return Err(String::from("Unkown file type")),
         }
-        self.textures.push(texture);
+        self.texture = Some(texture);
         Ok(())
     }
-    pub fn add_program(&mut self, program: Program) -> Result<(), String> {
-        self.program = Some(program);
+    pub fn add_program(&mut self, program: &'a Program) -> Result<(), String> {
+        self.program = Some(&program);
         Ok(())
     }
 }

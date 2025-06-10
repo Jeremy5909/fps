@@ -1,5 +1,5 @@
 use engine::{
-    Point3, Scale3, Translation3, Vector4, element::Element, engine::Engine, hooks,
+    Point3, Scale3, Vector4, camera::Camera, element::Element, engine::Engine, hooks,
     program::Program,
 };
 
@@ -18,48 +18,42 @@ impl Light {
 }
 
 fn main() {
-    let mut engine = Engine::new("fps", Default::default())
-        .unwrap()
-        .add_hook(hooks::wasd_flying_movement)
-        .add_event_hook(hooks::event_hooks::mouse_movement);
+    let mut engine = Engine::new(
+        "fps",
+        Camera::default().positioned(Point3::new(0.0, 2.0, 6.0)),
+    )
+    .unwrap()
+    .add_hook(hooks::flycam)
+    .add_event_hook(hooks::event_hooks::mouse_movement);
 
+    let lights = vec![Light {
+        pos: Point3::new(0.0, 5.0, 0.0),
+        color: Vector4::new(1.0, 1.0, 1.0, 1.0),
+    }];
+
+    // there should only be one diffuse program, this need to be fixed where maybe i can add
+    // uniform to element and its updated on draw
     let mut diffuse = Program::from_name("resources/shaders/diffuse").unwrap();
-
-    let lights = vec![
-        Light {
-            pos: Point3::new(2.0, 3.0, 2.0),
-            color: Vector4::new(1.0, 0.0, 1.0, 1.0),
-        },
-        Light {
-            pos: Point3::new(-2.0, 3.0, -2.0),
-            color: Vector4::new(0.0, 1.0, 0.0, 1.0),
-        },
-    ];
-
     Light::add_lights(&lights, &mut diffuse);
-
-    // Light cubes for visualization
-    for light in &lights {
-        let mut element = Element::from_obj("resources/models/cube.obj", "resources/textures")
-            .unwrap()
-            .remove(0);
-        element.model = Translation3::from(light.pos).to_homogeneous()
-            * Scale3::new(0.3, 0.3, 0.3).to_homogeneous();
-
-        let program = Program::from_name("resources/shaders/emissive").unwrap();
-        program.set_uniform_vector4("color", &light.color);
-
-        element.add_program(program).unwrap();
-
-        engine.add_element(element);
-    }
 
     let mut astronaut = Element::from_obj("resources/models/astronaut.obj", "resources/textures")
         .unwrap()
         .remove(0);
-    astronaut.add_program(diffuse).unwrap();
-
+    astronaut.add_program(&diffuse).unwrap();
     engine.add_element(astronaut);
+
+    let mut diffuse_untextured =
+        Program::from_name("resources/shaders/diffuse_untextured").unwrap();
+    diffuse_untextured.set_uniform_vector4("albedo", &Vector4::new(0.7, 0.7, 0.7, 0.7));
+    Light::add_lights(&lights, &mut diffuse_untextured);
+
+    let mut ground = Element::from_obj("resources/models/plane.obj", "resources/textures")
+        .unwrap()
+        .remove(0);
+    ground.add_program(&diffuse_untextured).unwrap();
+    ground.model = Scale3::new(10.0, 10.0, 10.0).to_homogeneous();
+
+    engine.add_element(ground);
 
     engine.run();
 }

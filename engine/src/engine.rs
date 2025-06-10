@@ -10,17 +10,17 @@ use sdl2::{
 
 use crate::{camera::Camera, element::Element};
 
-pub struct Engine {
+pub struct Engine<'a> {
     window: Window,
     _gl_context: GLContext,
     event_pump: EventPump,
     pub camera: Camera,
-    elements: Vec<Element>,
+    elements: Vec<Element<'a>>,
     hooks: Vec<Box<dyn FnMut(&mut Engine)>>,
     event_hooks: Vec<Box<dyn FnMut(&mut Engine, &Event)>>,
     mouse: MouseUtil,
 }
-impl Engine {
+impl<'a> Engine<'a> {
     pub fn new(title: &str, camera: Camera) -> Result<Self, String> {
         let sdl = sdl2::init()?;
         let video = sdl.video()?;
@@ -69,7 +69,7 @@ impl Engine {
     fn render(&self) {
         self.elements.iter().for_each(|e| e.render(&self.camera));
     }
-    pub fn add_element(&mut self, element: Element) {
+    pub fn add_element(&mut self, element: Element<'a>) {
         self.elements.push(element);
     }
     pub fn key_pressed(&self, scan_code: Scancode) -> bool {

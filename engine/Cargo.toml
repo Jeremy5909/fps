@@ -7,6 +7,7 @@ edition = "2024"
 gl = "0.14.0"
 image = "0.25.6"
 nalgebra = "0.33.2"
+rapier3d = { version = "0.26.1", features = ["simd-stable"] }
 sdl2 = "0.37.0"
 tobj = "4.0.3"
 vertex_attrib = {path = "vertex_attrib"}

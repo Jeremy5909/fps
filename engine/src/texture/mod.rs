@@ -12,6 +12,9 @@ impl Texture {
     pub fn bind(&self) {
         unsafe { gl::BindTexture(gl::TEXTURE_2D, self.id) };
     }
+    pub fn unbind() {
+        unsafe { gl::BindTexture(gl::TEXTURE_2D, 0) };
+    }
 }
 impl Drop for Texture {
     fn drop(&mut self) {

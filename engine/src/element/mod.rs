@@ -13,15 +13,15 @@ use crate::{
     texture::Texture,
     vertex_arrray::VertexArray,
 };
-pub struct Element {
-    program: Option<Program>,
+pub struct Element<'a> {
+    program: Option<&'a Program>,
     vao: VertexArray,
-    textures: Vec<Texture>,
+    texture: Option<Texture>,
     index_count: i32,
     pub model: Matrix4<f32>,
 }
 
-impl Element {
+impl<'a> Element<'a> {
     pub fn new<V: VertexAttribPointers>(
         vertices: Vec<V>,
         indices: Vec<i32>,
@@ -46,7 +46,7 @@ impl Element {
         Ok(Self {
             program: None,
             vao,
-            textures: Vec::new(),
+            texture: None,
             index_count: indices.len() as i32,
             model: Matrix4::identity(),
         })
@@ -54,7 +54,12 @@ impl Element {
     pub(crate) fn render(&self, camera: &Camera) {
         self.vao.bind();
 
-        self.textures.iter().for_each(|texture| texture.bind());
+        if let Some(texture) = &self.texture {
+            texture.bind();
+        } else {
+            Texture::unbind();
+        }
+        self.texture.as_ref().inspect(|texture| texture.bind());
 
         if let Some(program) = &self.program {
             program.set_uniform_matrix4("projection", &camera.projection);

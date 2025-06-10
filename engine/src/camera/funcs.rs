@@ -6,13 +6,6 @@ impl Camera {
     pub fn position(&self) -> Point3<f32> {
         self.position
     }
-    pub fn set_position(&mut self, pos: Point3<f32>) {
-        self.position = pos;
-        self.update_view();
-    }
-    pub fn set_orientation(&mut self, orientation: Vector3<f32>) {
-        self.orientation = orientation;
-    }
     pub fn move_forward(&mut self) {
         self.position += self.orientation * self.movement_speed;
         self.update_view();

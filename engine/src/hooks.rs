@@ -2,7 +2,7 @@ use sdl2::keyboard::Scancode;
 
 use crate::engine::Engine;
 
-pub fn wasd_flying_movement(engine: &mut Engine) {
+pub fn flycam(engine: &mut Engine) {
     if engine.key_pressed(Scancode::W) {
         engine.camera.move_forward();
     }

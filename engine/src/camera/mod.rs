@@ -32,6 +32,11 @@ impl Camera {
         camera.update_view();
         camera
     }
+    pub fn positioned(mut self, pos: Point3<f32>) -> Self {
+        self.position = pos;
+        self.update_view();
+        self
+    }
     fn update_view(&mut self) {
         self.orientation.normalize_mut();
 
