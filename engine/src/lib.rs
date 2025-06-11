@@ -12,6 +12,7 @@ mod shader;
 mod texture;
 mod vertex_arrray;
 pub use nalgebra::*;
+pub use rapier3d::prelude::RigidBodyType;
 pub use sdl2::event;
 pub use sdl2::keyboard;
 pub use sdl2::mouse;

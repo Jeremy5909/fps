@@ -14,45 +14,47 @@ impl<'a> Element<'a> {
         let mut elements = Vec::new();
         for model in models {
             eprintln!("model '{}' loaded", model.name);
-            let mesh = model.mesh;
 
-            let verts: Vec<_> = mesh
+            let mesh_verts: Vec<_> = model
+                .mesh
                 .positions
                 .chunks_exact(3)
-                .map(|i| (i[0], i[1], i[2]).into())
+                .map(|i| (i[0], i[1], i[2]))
                 .collect();
-            let tex_coords: Vec<_> = mesh
+            let mesh_tex: Vec<_> = model
+                .mesh
                 .texcoords
                 .chunks_exact(2)
-                .map(|i| (i[0], i[1]).into())
+                .map(|i| (i[0], i[1]))
                 .collect();
-            let normals: Vec<_> = mesh
+            let mesh_norms: Vec<_> = model
+                .mesh
                 .normals
                 .chunks_exact(3)
-                .map(|i| (i[0], i[1], i[2]).into())
+                .map(|i| (i[0], i[1], i[2]))
                 .collect();
-            let indices = mesh.indices.iter().map(|i| *i as i32).collect();
 
-            let verts: Vec<_> = verts
+            let vertexes: Vec<_> = mesh_verts
                 .iter()
-                .zip(&tex_coords)
-                .zip(&normals)
-                .map(|((a, b), c)| (a, b, c))
+                .zip(&mesh_tex)
+                .zip(&mesh_norms)
+                .map(|((a, b), c)| ((*a).into(), (*b).into(), (*c).into()))
                 .collect();
-            let verts: Vec<_> = verts
+            let vertexes: Vec<_> = vertexes
                 .iter()
                 .map(|(vert, tex_coord, normals)| DiffuseVertex {
                     // Vertex should be generic or something
                     // so it can have any vertex
-                    pos: **vert,
-                    tex_coord: **tex_coord,
-                    normal: **normals,
+                    pos: *vert,
+                    tex_coord: *tex_coord,
+                    normal: *normals,
                     color: (1.0, 1.0, 1.0).into(),
                 })
                 .collect();
 
-            let mut element = Element::new(verts, indices)?;
-            if let Some(id) = mesh.material_id {
+            let id = model.mesh.material_id;
+            let mut element = Element::new(vertexes, model.mesh)?;
+            if let Some(id) = id {
                 let material = materials
                     .get(id)
                     .ok_or(String::from("Material not found"))?;
@@ -67,6 +69,6 @@ impl<'a> Element<'a> {
         Ok(elements)
     }
     pub fn from_fbx(file_name: &str) -> Result<Vec<Element>, String> {
-        todo!();
+        todo!("{file_name}");
     }
 }

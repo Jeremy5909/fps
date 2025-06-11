@@ -23,6 +23,11 @@ pub fn flycam(engine: &mut Engine) {
     }
 }
 
+pub fn physics(engine: &mut Engine) {
+    engine.physics_step();
+    engine.sync_physics();
+}
+
 pub mod event_hooks {
     use sdl2::event::Event;
 

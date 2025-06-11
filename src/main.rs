@@ -1,5 +1,9 @@
 use engine::{
-    Point3, Scale3, Vector4, camera::Camera, element::Element, engine::Engine, hooks,
+    Point3, RigidBodyType, Scale3, Transform3, Translation3, Vector4,
+    camera::Camera,
+    element::{Element, physics::ColliderShape},
+    engine::Engine,
+    hooks,
     program::Program,
 };
 
@@ -23,7 +27,9 @@ fn main() {
         Camera::default().positioned(Point3::new(0.0, 2.0, 6.0)),
     )
     .unwrap()
+    .add_physics()
     .add_hook(hooks::flycam)
+    .add_hook(hooks::physics)
     .add_event_hook(hooks::event_hooks::mouse_movement);
 
     let lights = vec![Light {
@@ -31,29 +37,35 @@ fn main() {
         color: Vector4::new(1.0, 1.0, 1.0, 1.0),
     }];
 
-    // there should only be one diffuse program, this need to be fixed where maybe i can add
-    // uniform to element and its updated on draw
+    // Shaders
     let mut diffuse = Program::from_name("resources/shaders/diffuse").unwrap();
     Light::add_lights(&lights, &mut diffuse);
-
-    let mut astronaut = Element::from_obj("resources/models/astronaut.obj", "resources/textures")
-        .unwrap()
-        .remove(0);
-    astronaut.add_program(&diffuse).unwrap();
-    engine.add_element(astronaut);
-
+    // there should only be one diffuse program, this need to be fixed where maybe i can add
+    // uniform to element and its updated on draw
     let mut diffuse_untextured =
         Program::from_name("resources/shaders/diffuse_untextured").unwrap();
     diffuse_untextured.set_uniform("albedo", &Vector4::new(0.7, 0.7, 0.7, 0.7));
     Light::add_lights(&lights, &mut diffuse_untextured);
 
-    let mut ground = Element::from_obj("resources/models/plane.obj", "resources/textures")
+    let ground = Element::from_obj("resources/models/plane.obj", "resources/textures")
         .unwrap()
-        .remove(0);
-    ground.add_program(&diffuse_untextured).unwrap();
-    ground.model = Scale3::new(10.0, 10.0, 10.0).to_homogeneous();
-
+        .remove(0)
+        .add_program(&diffuse_untextured)
+        .unwrap()
+        .add_collider(ColliderShape::Cuboid(10.0, 1.0, 10.0))
+        .unwrap()
+        .add_rigid_body(RigidBodyType::Fixed);
     engine.add_element(ground);
+
+    let astronaut = Element::from_obj("resources/models/astronaut.obj", "resources/textures")
+        .unwrap()
+        .remove(0)
+        .add_program(&diffuse)
+        .unwrap()
+        .add_collider(ColliderShape::ConvexHull)
+        .unwrap()
+        .add_rigid_body(RigidBodyType::Dynamic);
+    engine.add_element(astronaut);
 
     engine.run();
 }

@@ -1,10 +1,12 @@
 use std::ptr;
 
-use nalgebra::Matrix4;
+use nalgebra::{Matrix3, Matrix4, Transform, Transform3};
+use rapier3d::prelude::{Collider, ColliderHandle, RigidBody, RigidBodyHandle};
+use tobj::Mesh;
 use vertex_attrib::VertexAttribPointers;
 
 mod from_file;
-mod funcs;
+pub mod physics;
 
 use crate::{
     buffer::{ArrayBuffer, ElementBuffer},
@@ -17,18 +19,20 @@ pub struct Element<'a> {
     program: Option<&'a Program>,
     vao: VertexArray,
     texture: Option<Texture>,
-    index_count: i32,
-    pub model: Matrix4<f32>,
+    index_count: usize,
+    pub(crate) model: Matrix4<f32>,
+    pub(crate) collider: Option<Collider>,
+    pub(crate) rigid_body: Option<RigidBody>,
+    pub(crate) rigid_body_handle: Option<RigidBodyHandle>,
+    pub(crate) collider_handle: Option<ColliderHandle>,
+    mesh: Mesh,
 }
 
 impl<'a> Element<'a> {
-    pub fn new<V: VertexAttribPointers>(
-        vertices: Vec<V>,
-        indices: Vec<i32>,
-    ) -> Result<Self, String> {
+    pub fn new<V: VertexAttribPointers>(vertices: Vec<V>, mesh: Mesh) -> Result<Self, String> {
         let ebo = ElementBuffer::new();
         ebo.bind();
-        ebo.static_draw_data(&indices);
+        ebo.static_draw_data(&mesh.indices);
         ebo.unbind();
         let vbo = ArrayBuffer::new();
         vbo.bind();
@@ -44,11 +48,16 @@ impl<'a> Element<'a> {
         ebo.unbind();
 
         Ok(Self {
-            program: None,
-            vao,
-            texture: None,
-            index_count: indices.len() as i32,
             model: Matrix4::identity(),
+            index_count: mesh.indices.len(),
+            vao,
+            mesh,
+            collider: None,
+            rigid_body: None,
+            program: None,
+            texture: None,
+            rigid_body_handle: None,
+            collider_handle: None,
         })
     }
     pub(crate) fn render(&self, camera: &Camera) {
@@ -70,10 +79,29 @@ impl<'a> Element<'a> {
         unsafe {
             gl::DrawElements(
                 gl::TRIANGLES,
-                self.index_count,
+                self.index_count as i32,
                 gl::UNSIGNED_INT,
                 ptr::null(),
             );
         }
+    }
+    pub fn add_texture(&mut self, texture_path: &str) -> Result<(), String> {
+        let texture = Texture::new();
+        let file_type = texture_path
+            .split(|x| x == '.')
+            .skip(1)
+            .next()
+            .ok_or("Must have file type")?;
+        match file_type {
+            "jpg" => texture.load_jpg(texture_path).map_err(|e| e.to_string())?,
+            "png" => texture.load_png(texture_path).map_err(|e| e.to_string())?,
+            _ => return Err(String::from("Unkown file type")),
+        }
+        self.texture = Some(texture);
+        Ok(())
+    }
+    pub fn add_program(mut self, program: &'a Program) -> Result<Self, String> {
+        self.program = Some(&program);
+        Ok(self)
     }
 }

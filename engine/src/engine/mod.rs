@@ -1,5 +1,6 @@
 use std::{mem, os::raw::c_void};
 
+use physics::Physics;
 use sdl2::{
     EventPump,
     event::{self, Event},
@@ -10,6 +11,8 @@ use sdl2::{
 
 use crate::{camera::Camera, element::Element};
 
+mod physics;
+
 pub struct Engine<'a> {
     window: Window,
     _gl_context: GLContext,
@@ -19,6 +22,7 @@ pub struct Engine<'a> {
     hooks: Vec<Box<dyn FnMut(&mut Engine)>>,
     event_hooks: Vec<Box<dyn FnMut(&mut Engine, &Event)>>,
     mouse: MouseUtil,
+    physics: Option<Physics>,
 }
 impl<'a> Engine<'a> {
     pub fn new(title: &str, camera: Camera) -> Result<Self, String> {
@@ -49,6 +53,7 @@ impl<'a> Engine<'a> {
             hooks: Vec::new(),
             event_hooks: Vec::new(),
             mouse: sdl.mouse(),
+            physics: None,
         })
     }
     pub fn events(&mut self) -> Vec<sdl2::event::Event> {
@@ -69,21 +74,10 @@ impl<'a> Engine<'a> {
     fn render(&self) {
         self.elements.iter().for_each(|e| e.render(&self.camera));
     }
-    pub fn add_element(&mut self, element: Element<'a>) {
-        self.elements.push(element);
-    }
     pub fn key_pressed(&self, scan_code: Scancode) -> bool {
         self.event_pump
             .keyboard_state()
             .is_scancode_pressed(scan_code)
-    }
-    pub fn add_hook(mut self, hook: impl FnMut(&mut Engine) + 'static) -> Self {
-        self.hooks.push(Box::new(hook));
-        self
-    }
-    pub fn add_event_hook(mut self, hook: impl FnMut(&mut Engine, &Event) + 'static) -> Self {
-        self.event_hooks.push(Box::new(hook));
-        self
     }
     pub fn set_relative_mouse(&mut self) {
         self.mouse.set_relative_mouse_mode(true);
@@ -118,5 +112,30 @@ impl<'a> Engine<'a> {
             self.render();
             self.swap_window();
         }
+    }
+    pub fn add_element(&mut self, mut element: Element<'a>) {
+        if let Some(physics) = &mut self.physics {
+            if let Some(rb) = element.rigid_body.take() {
+                let rb_handle = physics.rigid_body_set.insert(rb);
+                if let Some(collider) = element.collider.take() {
+                    let col_handle = physics.collider_set.insert_with_parent(
+                        collider,
+                        rb_handle,
+                        &mut physics.rigid_body_set,
+                    );
+                    element.collider_handle = Some(col_handle);
+                }
+                element.rigid_body_handle = Some(rb_handle);
+            }
+        }
+        self.elements.push(element);
+    }
+    pub fn add_hook(mut self, hook: impl FnMut(&mut Engine) + 'static) -> Self {
+        self.hooks.push(Box::new(hook));
+        self
+    }
+    pub fn add_event_hook(mut self, hook: impl FnMut(&mut Engine, &Event) + 'static) -> Self {
+        self.event_hooks.push(Box::new(hook));
+        self
     }
 }
