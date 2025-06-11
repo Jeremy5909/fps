@@ -62,9 +62,9 @@ impl<'a> Element<'a> {
         self.texture.as_ref().inspect(|texture| texture.bind());
 
         if let Some(program) = &self.program {
-            program.set_uniform_matrix4("projection", &camera.projection);
-            program.set_uniform_matrix4("view", &camera.view);
-            program.set_uniform_matrix4("model", &self.model);
+            program.set_uniform("projection", &camera.projection);
+            program.set_uniform("view", &camera.view);
+            program.set_uniform("model", &self.model);
         }
 
         unsafe {

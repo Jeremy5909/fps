@@ -10,10 +10,10 @@ struct Light {
 impl Light {
     fn add_lights(lights: &Vec<Light>, diffuse: &mut Program) {
         for (i, light) in lights.iter().enumerate() {
-            diffuse.set_uniform_vector3(&format!("lights[{}].position", i), &light.pos.coords);
-            diffuse.set_uniform_vector4(&format!("lights[{}].color", i), &light.color);
+            diffuse.set_uniform(&format!("lights[{}].position", i), &light.pos.coords);
+            diffuse.set_uniform(&format!("lights[{}].color", i), &light.color);
         }
-        diffuse.set_uniform_1i("lightCount", lights.len() as i32);
+        diffuse.set_uniform("lightCount", &(lights.len() as i32));
     }
 }
 
@@ -44,7 +44,7 @@ fn main() {
 
     let mut diffuse_untextured =
         Program::from_name("resources/shaders/diffuse_untextured").unwrap();
-    diffuse_untextured.set_uniform_vector4("albedo", &Vector4::new(0.7, 0.7, 0.7, 0.7));
+    diffuse_untextured.set_uniform("albedo", &Vector4::new(0.7, 0.7, 0.7, 0.7));
     Light::add_lights(&lights, &mut diffuse_untextured);
 
     let mut ground = Element::from_obj("resources/models/plane.obj", "resources/textures")

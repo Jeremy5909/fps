@@ -1,8 +1,8 @@
 use std::{ffi::CString, fs};
 
-use nalgebra::{Matrix3, Matrix4, Vector3, Vector4};
-
 use crate::{shader::Shader, whitespace_cstring_with_len};
+
+mod uniform;
 
 pub struct Program {
     id: gl::types::GLuint,
@@ -62,46 +62,6 @@ impl Program {
     }
     pub(crate) fn set_used(&self) {
         unsafe { gl::UseProgram(self.id) };
-    }
-    pub fn set_uniform_1i(&self, name: &str, val: i32) {
-        self.set_used();
-        let location =
-            unsafe { gl::GetUniformLocation(self.id, CString::new(name).unwrap().as_ptr()) };
-        unsafe {
-            gl::Uniform1i(location, val);
-        }
-    }
-    pub fn set_uniform_vector3(&self, name: &str, matrix: &Vector3<f32>) {
-        self.set_used();
-        let location =
-            unsafe { gl::GetUniformLocation(self.id, CString::new(name).unwrap().as_ptr()) };
-        unsafe {
-            gl::Uniform3f(location, matrix.x, matrix.y, matrix.z);
-        }
-    }
-    pub fn set_uniform_vector4(&self, name: &str, matrix: &Vector4<f32>) {
-        self.set_used();
-        let location =
-            unsafe { gl::GetUniformLocation(self.id, CString::new(name).unwrap().as_ptr()) };
-        unsafe {
-            gl::Uniform4f(location, matrix.x, matrix.y, matrix.z, matrix.w);
-        }
-    }
-    pub fn set_uniform_matrix3(&self, name: &str, matrix: &Matrix3<f32>) {
-        self.set_used();
-        let location =
-            unsafe { gl::GetUniformLocation(self.id, CString::new(name).unwrap().as_ptr()) };
-        unsafe {
-            gl::UniformMatrix3fv(location, 1, gl::FALSE, matrix.as_ptr());
-        }
-    }
-    pub fn set_uniform_matrix4(&self, name: &str, matrix: &Matrix4<f32>) {
-        self.set_used();
-        let location =
-            unsafe { gl::GetUniformLocation(self.id, CString::new(name).unwrap().as_ptr()) };
-        unsafe {
-            gl::UniformMatrix4fv(location, 1, gl::FALSE, matrix.as_ptr());
-        }
     }
 }
 impl Drop for Program {
