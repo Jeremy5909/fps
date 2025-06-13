@@ -10,7 +10,7 @@ use super::Engine;
 pub(super) struct Physics {
     pub rigid_body_set: RigidBodySet,
     pub collider_set: ColliderSet,
-    integreation_parameters: IntegrationParameters,
+    pub integreation_parameters: IntegrationParameters,
     physics_pipeline: PhysicsPipeline,
     island_manager: IslandManager,
     broad_phase: BroadPhaseMultiSap,

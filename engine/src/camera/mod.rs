@@ -55,7 +55,7 @@ impl Default for Camera {
             f32::consts::PI / 3.0,
             0.1,
             100.0,
-            0.005,
+            0.1,
         )
     }
 }

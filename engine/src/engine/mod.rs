@@ -1,4 +1,4 @@
-use std::{mem, os::raw::c_void};
+use std::{mem, os::raw::c_void, time::Instant};
 
 use physics::Physics;
 use sdl2::{
@@ -22,6 +22,8 @@ pub struct Engine<'a> {
     hooks: Vec<Box<dyn FnMut(&mut Engine)>>,
     event_hooks: Vec<Box<dyn FnMut(&mut Engine, &Event)>>,
     mouse: MouseUtil,
+    last_time: Instant,
+    accumulated_time: f32,
     physics: Option<Physics>,
 }
 impl<'a> Engine<'a> {
@@ -54,6 +56,8 @@ impl<'a> Engine<'a> {
             event_hooks: Vec::new(),
             mouse: sdl.mouse(),
             physics: None,
+            last_time: Instant::now(),
+            accumulated_time: 0.0,
         })
     }
     pub fn events(&mut self) -> Vec<sdl2::event::Event> {
@@ -83,7 +87,15 @@ impl<'a> Engine<'a> {
         self.mouse.set_relative_mouse_mode(true);
     }
     pub fn run(&mut self) {
+        const FIXED_DT: f32 = 1.0 / 60.0;
+
         'main: loop {
+            let now = Instant::now();
+            let frame_dt = (now - self.last_time).as_secs_f32();
+            self.last_time = now;
+
+            self.accumulated_time += frame_dt;
+
             let mut hooks = mem::take(&mut self.hooks);
             let mut event_hooks = mem::take(&mut self.event_hooks);
 
@@ -102,9 +114,16 @@ impl<'a> Engine<'a> {
                     hook(self, &event);
                 }
             }
-            for hook in &mut hooks {
-                hook(self);
+            while self.accumulated_time >= FIXED_DT {
+                if let Some(physics) = &mut self.physics {
+                    physics.integreation_parameters.dt = FIXED_DT;
+                }
+                for hook in &mut hooks {
+                    hook(self);
+                }
+                self.accumulated_time -= FIXED_DT;
             }
+
             self.hooks = hooks;
             self.event_hooks = event_hooks;
 
