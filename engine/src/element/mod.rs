@@ -1,6 +1,6 @@
 use std::ptr;
 
-use nalgebra::{Matrix3, Matrix4, Scale3};
+use nalgebra::{Matrix4, Vector3};
 use rapier3d::prelude::{Collider, ColliderHandle, RigidBody, RigidBodyHandle};
 use tobj::Mesh;
 use vertex_attrib::VertexAttribPointers;
@@ -60,6 +60,19 @@ impl<'a> Element<'a> {
             collider_handle: None,
         })
     }
+
+    pub fn position(&self) -> Vector3<f32> {
+        self.model.column(3).xyz()
+    }
+    pub fn scale(&self) -> Vector3<f32> {
+        Vector3::from_iterator(
+            self.model
+                .fixed_view::<3, 3>(0, 0)
+                .column_iter()
+                .map(|col| col.norm()),
+        )
+    }
+
     pub(crate) fn render(&self, camera: &Camera) {
         self.vao.bind();
 

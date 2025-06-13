@@ -81,13 +81,8 @@ impl<'a> Engine<'a> {
             for element in &mut self.elements {
                 if let Some(handle) = element.rigid_body_handle {
                     if let Some(rigid_body) = physics.rigid_body_set.get(handle) {
-                        let scale_x = element.model.fixed_view::<3, 1>(0, 0).norm();
-                        let scale_y = element.model.fixed_view::<3, 1>(0, 1).norm();
-                        let scale_z = element.model.fixed_view::<3, 1>(0, 2).norm();
-
                         element.model = rigid_body.position().to_homogeneous()
-                            * Scale3::from(Vector3::new(scale_x, scale_y, scale_z))
-                                .to_homogeneous();
+                            * Scale3::from(element.scale()).to_homogeneous();
                     }
                 }
             }

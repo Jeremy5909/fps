@@ -33,11 +33,9 @@ impl<'a> Element<'a> {
         Ok(())
     }
     pub fn add_rigid_body(&mut self, rigid_body_type: RigidBodyType) {
-        let translation: Vector3<f32> = self.model.column(3).xyz();
-
         self.rigid_body = Some(
             RigidBodyBuilder::new(rigid_body_type)
-                .translation(translation)
+                .translation(self.position())
                 .build(),
         );
         eprintln!("Rigid body added");
