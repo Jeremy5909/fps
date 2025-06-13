@@ -6,6 +6,7 @@ use sdl2::{
     event::{self, Event},
     keyboard::Scancode,
     mouse::MouseUtil,
+    sys::SDL_GL_SetAttribute,
     video::{GLContext, Window},
 };
 
@@ -43,9 +44,16 @@ impl<'a> Engine<'a> {
             .unwrap();
         let _gl_context = window.gl_create_context().unwrap();
         let _gl = gl::load_with(|s| video.gl_get_proc_address(s) as *const c_void);
-
         let event_pump = sdl.event_pump()?;
-        unsafe { gl::Enable(gl::DEPTH_TEST) };
+
+        unsafe {
+            // Anti aliasing
+            SDL_GL_SetAttribute(sdl2::sys::SDL_GLattr::SDL_GL_MULTISAMPLEBUFFERS, 1);
+            SDL_GL_SetAttribute(sdl2::sys::SDL_GLattr::SDL_GL_MULTISAMPLESAMPLES, 4);
+            gl::Enable(gl::MULTISAMPLE);
+
+            gl::Enable(gl::DEPTH_TEST);
+        }
         Ok(Self {
             event_pump,
             window,
