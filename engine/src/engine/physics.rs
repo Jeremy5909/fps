@@ -1,4 +1,4 @@
-use nalgebra::{Vector3, vector};
+use nalgebra::{Scale3, Vector3, vector};
 use rapier3d::prelude::{
     BroadPhaseMultiSap, CCDSolver, ColliderSet, DefaultBroadPhase, EventHandler, ImpulseJointSet,
     IntegrationParameters, IslandManager, MultibodyJointSet, NarrowPhase, PhysicsHooks,
@@ -81,8 +81,13 @@ impl<'a> Engine<'a> {
             for element in &mut self.elements {
                 if let Some(handle) = element.rigid_body_handle {
                     if let Some(rigid_body) = physics.rigid_body_set.get(handle) {
-                        let position = rigid_body.position();
-                        element.model = position.to_homogeneous();
+                        let scale_x = element.model.fixed_view::<3, 1>(0, 0).norm();
+                        let scale_y = element.model.fixed_view::<3, 1>(0, 1).norm();
+                        let scale_z = element.model.fixed_view::<3, 1>(0, 2).norm();
+
+                        element.model = rigid_body.position().to_homogeneous()
+                            * Scale3::from(Vector3::new(scale_x, scale_y, scale_z))
+                                .to_homogeneous();
                     }
                 }
             }

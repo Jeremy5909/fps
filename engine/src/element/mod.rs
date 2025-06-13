@@ -1,6 +1,6 @@
 use std::ptr;
 
-use nalgebra::{Matrix3, Matrix4, Transform, Transform3};
+use nalgebra::{Matrix3, Matrix4, Scale3};
 use rapier3d::prelude::{Collider, ColliderHandle, RigidBody, RigidBodyHandle};
 use tobj::Mesh;
 use vertex_attrib::VertexAttribPointers;
@@ -20,7 +20,7 @@ pub struct Element<'a> {
     vao: VertexArray,
     texture: Option<Texture>,
     index_count: usize,
-    pub(crate) model: Matrix4<f32>,
+    pub model: Matrix4<f32>,
     pub(crate) collider: Option<Collider>,
     pub(crate) rigid_body: Option<RigidBody>,
     pub(crate) rigid_body_handle: Option<RigidBodyHandle>,
@@ -100,8 +100,8 @@ impl<'a> Element<'a> {
         self.texture = Some(texture);
         Ok(())
     }
-    pub fn add_program(mut self, program: &'a Program) -> Result<Self, String> {
+    pub fn add_program(&mut self, program: &'a Program) -> Result<(), String> {
         self.program = Some(&program);
-        Ok(self)
+        Ok(())
     }
 }

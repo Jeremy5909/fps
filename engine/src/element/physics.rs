@@ -1,4 +1,4 @@
-use nalgebra::Point3;
+use nalgebra::{Point3, Vector3};
 use rapier3d::prelude::{ColliderBuilder, RigidBodyBuilder, RigidBodyType};
 
 use super::Element;
@@ -9,7 +9,7 @@ pub enum ColliderShape {
 }
 
 impl<'a> Element<'a> {
-    pub fn add_collider(mut self, shape: ColliderShape) -> Result<Self, String> {
+    pub fn add_collider(&mut self, shape: ColliderShape) -> Result<(), String> {
         let mesh_verts: Vec<_> = self
             .mesh
             .positions
@@ -30,11 +30,16 @@ impl<'a> Element<'a> {
         .build();
         self.collider = Some(collider);
         eprintln!("Collider added");
-        Ok(self)
+        Ok(())
     }
-    pub fn add_rigid_body(mut self, rigid_body_type: RigidBodyType) -> Self {
-        self.rigid_body = Some(RigidBodyBuilder::new(rigid_body_type).build());
+    pub fn add_rigid_body(&mut self, rigid_body_type: RigidBodyType) {
+        let translation: Vector3<f32> = self.model.column(3).xyz();
+
+        self.rigid_body = Some(
+            RigidBodyBuilder::new(rigid_body_type)
+                .translation(translation)
+                .build(),
+        );
         eprintln!("Rigid body added");
-        self
     }
 }

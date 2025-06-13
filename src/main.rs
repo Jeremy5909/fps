@@ -1,5 +1,5 @@
 use engine::{
-    Point3, RigidBodyType, Scale3, Transform3, Translation3, Vector4,
+    Point3, RigidBodyType, Scale3, Translation3, Vector4,
     camera::Camera,
     element::{Element, physics::ColliderShape},
     engine::Engine,
@@ -47,24 +47,24 @@ fn main() {
     diffuse_untextured.set_uniform("albedo", &Vector4::new(0.7, 0.7, 0.7, 0.7));
     Light::add_lights(&lights, &mut diffuse_untextured);
 
-    let ground = Element::from_obj("resources/models/plane.obj", "resources/textures")
+    let mut ground = Element::from_obj("resources/models/plane.obj", "resources/textures")
         .unwrap()
-        .remove(0)
-        .add_program(&diffuse_untextured)
-        .unwrap()
-        .add_collider(ColliderShape::Cuboid(10.0, 1.0, 10.0))
-        .unwrap()
-        .add_rigid_body(RigidBodyType::Fixed);
+        .remove(0);
+    ground.model *= Scale3::new(5.0, 5.0, 5.0).to_homogeneous();
+    ground.add_program(&diffuse_untextured).unwrap();
+    ground
+        .add_collider(ColliderShape::Cuboid(10.0, 0.1, 10.0))
+        .unwrap();
+    ground.add_rigid_body(RigidBodyType::Fixed);
     engine.add_element(ground);
 
-    let astronaut = Element::from_obj("resources/models/astronaut.obj", "resources/textures")
+    let mut astronaut = Element::from_obj("resources/models/astronaut.obj", "resources/textures")
         .unwrap()
-        .remove(0)
-        .add_program(&diffuse)
-        .unwrap()
-        .add_collider(ColliderShape::ConvexHull)
-        .unwrap()
-        .add_rigid_body(RigidBodyType::Dynamic);
+        .remove(0);
+    astronaut.model *= Translation3::new(0.0, 2.0, 0.0).to_homogeneous();
+    astronaut.add_program(&diffuse).unwrap();
+    astronaut.add_collider(ColliderShape::ConvexHull).unwrap();
+    astronaut.add_rigid_body(RigidBodyType::Dynamic);
     engine.add_element(astronaut);
 
     engine.run();
